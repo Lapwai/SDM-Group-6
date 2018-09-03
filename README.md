@@ -1,8 +1,6 @@
 # SDM-Group-6
 
 
-
-
 ## Tutor
     Jim Buchan
 
@@ -11,4 +9,6 @@
     Andy Liu
     Arlen Yang
     Laura Fang
+    
+    
     

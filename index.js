@@ -19,12 +19,12 @@ express()
 .set('view engine', 'ejs')
 .get('/', (req, res) => res.render('pages/index'))
 .get('/cool', (req, res) => res.send(cool()))
-.get('/db', async (req, res) => {
+.get('/db1', async (req, res) => {
      try {
      const client = await pool.connect()
      const results = await client.query('SELECT * FROM test_table');
      console.log(results.rows)
-     res.render('pages/db', {results:results.rows})
+     res.render('pages/db1', {results:results.rows})
      client.release();
      } catch (err) {
      console.error(err);

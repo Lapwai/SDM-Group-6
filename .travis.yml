@@ -1,6 +1,8 @@
 language: node_js
-
 deploy:
   provider: heroku
-  api_key: "51947912-1e0f-404b-ae9e-55fc685d6739"
-  app: sdm-g6
+  api_key:
+    secure: t18YIS+Cu2jnBNWyoGLpItDZxBKs/0VNVogM2l+wHB9ARnwuTqnTZ7ltEOGSdYGaWTCL7FaPawazhLGeKrkzb6f6IJMhE02idM5Qj6UNEEZeknhsFLW6mZP2xMPskoYQTiBvHiz3j1SGgvMY8VbP47ukzXmrX7cdtsSOv2Z3XCrnIEBplxGe/GJ/+Ef9yBtyQyjlIUmyVcQbgbKfh/PA11IVpMGvZJtq790wDZAKAuTW5wKu9iwB15ZSfilrXB+YDlB7x6xxbRBe99W3XrqRQt1PjrUMsVYl6oXbCv4dAGhN5USnc88h24LeUhhkwc3wce4IcyIIEFTej4gwLU6NhXW1DvKxxCC/Pu24+VWd8NYr5MArDIsI6MdBnDdzaBw9LL28HLyQ5Ie2xPIKK3ksrNfgO1fl/4wO9Hp4FcWtZsj7bDAz4mJemX9/lP8npIxnZ7Hi2padKonH1AqwAsPhnKbFRHGPD2JOM1EYh3GcoEdwfyoAZIYg/DO5s/CwP4b7mKCkCf0Sz/Ft0sBGt6yuHxSpGyw0avxkzrCt09vfLlAPMBj7f5lL6ryaPHrWEGeazkrui6qQeliKMJQ3Qs9Sj0MIyv6h8agBMehtBo6n+CpKUHqu01WpFWW3MXfHXAoq0JWNe0S6Kv+IsiLeqI7wz5SNPYeB61HDYUvLm71XtQA=
+  app: SDM-Group-6
+  on:
+    repo: Lapwai/SDM-Group-6

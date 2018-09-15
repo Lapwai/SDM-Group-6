@@ -1,1 +1,6 @@
 language: node_js
+
+deploy:
+  provider: heroku
+  api_key: "51947912-1e0f-404b-ae9e-55fc685d6739"
+  app: sdm-g6

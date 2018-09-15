@@ -24,7 +24,7 @@ function kittenbot() {
     var controller = Botkit.slackbot({debug: false})
     controller
     .spawn({
-           token: 'xoxb-434508566676-433992928064-YqMhX0D2iaeiRJvPEOeqL3L6' // Edit this line!
+           token: 'xoxb-417145055956-431634656690-g7EN1OhTA9yZ49dpklBCrY3G' // Edit this line!
            })
     .startRTM(function (err) {
               if (err) {

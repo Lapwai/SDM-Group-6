@@ -13,6 +13,9 @@ const pool = new Pool({
 
 kittenbot();
 
+const testStr = {versionName : '1.0.0', versionCode : 200};
+
+
 express()
 .use(express.static(path.join(__dirname, 'public')))
 .set('views', path.join(__dirname, 'views'))
@@ -31,6 +34,9 @@ express()
      res.send("Error " + err);
      }
      })
+.get('/test', function(req,res) {
+    res.send(JSON.stringfy(testStr));
+});
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 

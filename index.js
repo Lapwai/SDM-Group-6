@@ -36,7 +36,7 @@ express()
      })
 .get('/test', function(req,res) {
     res.send(JSON.stringfy(testStr));
-});
+})
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 
 

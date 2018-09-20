@@ -2,7 +2,7 @@ const cool = require('cool-ascii-faces')
 const express = require('express')
 const path = require('path')
 const PORT = process.env.PORT || 5000
-var kittenbot=require('./kittenbot');
+var Kittenbot=require('./kittenbot');
 //const DATABASE_URL = "/Users/eleven/Library/Application Support/Postgres/var-10"
 
 const { Pool } = require('pg');
@@ -11,7 +11,7 @@ const pool = new Pool({
                       ssl: false
                       });
 
-kittenbot();
+Kittenbot();                      
 
 const testStr = {versionName : '1.0.0', versionCode : 200};
 

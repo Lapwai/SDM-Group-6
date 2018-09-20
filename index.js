@@ -38,9 +38,12 @@ express()
      res.send("Error " + err);
      }
      })
-.post('/test', function(req,res) {    
+.post('/test', function(req,res) {
 
-    res.send(JSON.stringify(req.params));
+    var pathname = url.parse(req.url).pathname;
+    
+
+    res.send(JSON.stringify(pathname));
 })
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 

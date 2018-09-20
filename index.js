@@ -11,7 +11,7 @@ const pool = new Pool({
                       ssl: false
                       });
 
-//kittenbot();
+kittenbot();
 
 const testStr = {versionName : '1.0.0', versionCode : 200};
 

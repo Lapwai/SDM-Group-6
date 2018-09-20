@@ -18,24 +18,43 @@ This is a sample Slack bot built with Botkit.
 */
 
 
-var Botkit = require('botkit')
+// var Botkit = require('botkit')
 
-function kittenbot() {
-    var controller = Botkit.slackbot({debug: false})
-    controller
-    .spawn({
-           token: 'xoxb-434508566676-433992928064-YqMhX0D2iaeiRJvPEOeqL3L6' // Edit this line!
-           })
-    .startRTM(function (err) {
-              if (err) {
-              throw new Error(err)
-              }
-              })
-    
-    controller.hears(
-                     ['hello', 'hi'], ['direct_message', 'direct_mention', 'mention'],
-                     function (bot, message) { bot.reply(message, 'Meow. :smile_cat:') })
-}
+// function kittenbot() {
+//     var controller = Botkit.slackbot({debug: false})
+//     controller
+//     .spawn({
+//            token: 'xoxb-434508566676-433992928064-YqMhX0D2iaeiRJvPEOeqL3L6' // Edit this line!
+//            })
+//     .startRTM(function (err) {
+//               if (err) {
+//               throw new Error(err)
+//               }
+//               })
+//     console.log(1)
+//     controller.hears(
+//                      ['hello', 'hi'], ['direct_message', 'direct_mention', 'mention'],
+//                      function (bot, message) { bot.reply(message, 'Meow. :smile_cat:') })
+// }
 
 
-module.exports=kittenbot;
+// module.exports=kittenbot;
+
+
+var http = require('http');
+
+var data = {key:'value',hello:'hello'};
+
+var srv = http.createServer(function(req,res){
+
+res.writeHead(200,{'Content-type':'application/json'});
+
+res.end(JSON.stringify(data));
+
+});
+
+srv.listen(8080,function(){
+
+console.log('listening on localhost:8080');
+
+});

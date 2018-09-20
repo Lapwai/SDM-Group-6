@@ -1,4 +1,6 @@
 
+'use strict'
+
 const User = require('./mochatest')
 const expect = require('chai').expect
 

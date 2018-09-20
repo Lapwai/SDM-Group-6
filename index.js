@@ -2,6 +2,10 @@ const cool = require('cool-ascii-faces')
 const express = require('express')
 const path = require('path')
 const PORT = process.env.PORT || 5000
+const url = require('url')
+const http = require('http')
+
+
 var Kittenbot=require('./kittenbot');
 //const DATABASE_URL = "/Users/eleven/Library/Application Support/Postgres/var-10"
 
@@ -11,7 +15,8 @@ const pool = new Pool({
                       ssl: false
                       });
 
-Kittenbot();                      
+Kittenbot.kittenbot();   
+
 
 const testStr = {versionName : '1.0.0', versionCode : 200};
 
@@ -33,8 +38,9 @@ express()
      res.send("Error " + err);
      }
      })
-.post('/test', function(req,res) {
-    res.send(JSON.stringify(testStr));
+.post('/test', function(req,res) {    
+
+    res.send(JSON.stringify(req.params));
 })
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))
 

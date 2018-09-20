@@ -39,9 +39,7 @@ express()
      }
      })
 .post('/test', function(req,res) {
-
     var pathname = url.parse(req.url).pathname;
-    
 
     res.send(JSON.stringify(pathname));
 })

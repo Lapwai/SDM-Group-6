@@ -33,7 +33,7 @@ express()
      res.send("Error " + err);
      }
      })
-.get('/test', function(req,res) {
+.post('/test', function(req,res) {
     res.send(JSON.stringify(testStr));
 })
 .listen(PORT, () => console.log(`Listening on ${ PORT }`))

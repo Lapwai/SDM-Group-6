@@ -8,10 +8,6 @@ deploy:
   app: sdm-g6
   on:
     repo: Lapwai/SDM-Group-6
-after_script: 
-  - git add .
-  - git commit -m "message"
-  - git pull
-  - git push 
+  skip_cleanup: true
 
   

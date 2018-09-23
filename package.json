@@ -8,7 +8,7 @@
   "private": true,
   "scripts": {
     "start": "node ./bin/www",
-    "test": "./node_modules/mocha/bin/mocha ./test/test.js"
+    "test": "./node_modules/mocha/bin/mocha ./tests/test.js"
   },
   "repository": {
     "type": "git",

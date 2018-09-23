@@ -9,6 +9,3 @@
     Andy Liu
     Arlen Yang
     Laura Fang
-    
-    
-    

@@ -14,19 +14,8 @@ var helmet = require('helmet');
 
 var app = express();
 
-app.use(helmet());
 
-// Set up pg connection
-var pg = require("pg");
-var pg_config = {
-  user:"kaudovrsryjbbf" || "postgres",
-  database:"d7g85u8il65m68" || "postgres",
-  password:"e5dc8bc6ec1f43c0cc1b2fd4673f1386b019ab61dd0d7f5ceb84e25a48b98c20" || "123456",
-  port:5432,
-  max:20, // 连接池最大连接数
-  idleTimeoutMillis:3000, // 连接最大空闲时间 3s
-}
-var pgPool = pg.Pool(pg_config);
+app.use(helmet());
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -44,9 +33,15 @@ next();
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+
+
 app.use('/', index);
 app.use('/slashcommand', slashcommand)
-chatbot.chatbot();
+// chatbot.chatbot();
+
+
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -65,3 +60,6 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+
+
+

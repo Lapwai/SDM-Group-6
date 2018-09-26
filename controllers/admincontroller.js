@@ -49,7 +49,7 @@ exports.add = function(req, res) {
 
         // If the xoxp token was revoked, go to legacy tokens generate a new one.
         params.splice(0,1)
-        var url = 'https://slack.com/api/users.list?token=xoxp-434508566676-434711974866-442930656496-5d3884b582d5303a6dca3fc3483056ef'
+        var url = 'https://slack.com/api/users.list?token=xoxp-434508566676-434711974866-433992924640-cdfcca1250e43a6ad13f0b1d7e490f66'
         request(url, { json: true }, (err, _, body) => {
             if(err || body['error']) {
                 res.send(err || body['error']);

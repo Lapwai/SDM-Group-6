@@ -4,7 +4,7 @@ function chatbot() {
     var controller = Botkit.slackbot({debug: false})
     controller
     .spawn({
-           token: 'xoxb-434508566676-433992928064-YqMhX0D2iaeiRJvPEOeqL3L6' // Edit this line!
+           token: 'xoxb-434508566676-433992928064-p1kwW8EG1a1bocnj1cwSsVqi' // Edit this line!
            })
     .startRTM(function (err) {
               if (err) {

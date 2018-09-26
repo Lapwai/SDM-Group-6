@@ -38,7 +38,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Important parts
 app.use('/', index);
 app.use('/slashcommand', slashcommand)
-chatbot.chatbot();
+//chatbot.chatbot();
 db.createTables();
 
 

@@ -46,29 +46,49 @@ exports.add = function(req, res) {
             return
         }
 
-        params.splice(0,1)
-        var url = 'https://slack.com/api/users.list?token=xoxp-434508566676-434711974866-442202130610-8bdf8c7649e31d9d0c3f67fa615bb132'
-        request(url, { json: true }, (err, response, body) => {
-            if(err) res.send(err);
 
+        // If the xoxp token was revoked, go to legacy tokens generate a new one.
+        params.splice(0,1)
+        var url = 'https://slack.com/api/users.list?token=xoxp-434508566676-434711974866-443828567573-3b0a58d4046fec84e2dc85f60232b133'
+        request(url, { json: true }, (err, _, body) => {
+            if(err || body['error']) {
+                res.send(err || body['error']);
+                return
+            }
             var dict = []
 
             var members = body['members']
-            members.forEach((element) => {
-                params.forEach( (para) => {
-                    if(para.substring(1) == element['name']) {
-                        let temp = [element['id'],element['name']]
-                        var display_name = element['profile']['display_name']
+            for(let i = 0; i<members.length; i++) {
+                for(let j = 0; j<params.length; j++) {
+                    if(params[j].substring(1) == members[i]['name']) {
+                        let temp = [members[i]['id'],members[i]['name']]
+                        var display_name = members[i]['profile']['display_name']
                         if(display_name.length == 0) {
-                            temp.push(element['profile']['real_name'])
+                            temp.push(members[i]['profile']['real_name'])
                         } else {
                             temp.push(display_name)
                         }
                         dict.push(temp)
                         return
                     }
-                })
-            });
+                }
+            }
+
+            // members.forEach((element) => {
+            //     params.forEach( (para) => {
+            //         if(para.substring(1) == element['name']) {
+            //             let temp = [element['id'],element['name']]
+            //             var display_name = element['profile']['display_name']
+            //             if(display_name.length == 0) {
+            //                 temp.push(element['profile']['real_name'])
+            //             } else {
+            //                 temp.push(display_name)
+            //             }
+            //             dict.push(temp)
+            //             return
+            //         }
+            //     })
+            // });
 
             var insertStr = 'INSERT INTO roles(user_id, user_name, real_name, role) VALUES '
             dict.forEach( (e) => {

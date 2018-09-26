@@ -10,5 +10,6 @@ router.get('/test', (req, res) => {
 
 router.post('/admin/init', admin_controller.init);
 
+router.post('/admin/roles', admin_controller.roles);
 
 module.exports = router;

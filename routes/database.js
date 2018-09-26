@@ -1,17 +1,4 @@
 
-// Set up pg connection
-// var pg = require("pg");
-
-// var pg_config = {
-//   user:"kaudovrsryjbbf" || "postgres",
-//   database:"d7g85u8il65m68" || "postgres",
-//   password:"e5dc8bc6ec1f43c0cc1b2fd4673f1386b019ab61dd0d7f5ceb84e25a48b98c20" || "123456",
-//   port:5432,
-//   max:20, // 连接池最大连接数
-//   idleTimeoutMillis:3000, // 连接最大空闲时间 3s
-// }
-// var pgPool = pg.Pool(pg_config);
-
 const { Pool } = require('pg');
 const pool = new Pool({
                       connectionString: process.env.DATABASE_URL ,
@@ -28,5 +15,57 @@ async function pgQuery(queryStr) {
     return results
 }
 
-module.exports = {pgQuery};
+
+
+
+
+var adminStr = 'CREATE TABLE IF NOT EXISTS admin ( \
+    user_id    TEXT PRIMARY KEY    NOT NULL, \
+    user_name  TEXT                NOT NULL \
+    ); '
+
+var userStr = 'CREATE TABLE IF NOT EXISTS roles ( \
+    user_id    TEXT PRIMARY KEY    NOT NULL, \
+    user_name  TEXT                NOT NULL, \
+    role       TEXT                NOT NULL \
+    ); '
+
+var notificationStr = 'CREATE TABLE IF NOT EXISTS notifications ( \
+    not_id     INT PRIMARY KEY     NOT NULL, \
+    user_name  TEXT                NOT NULL, \
+    time       TEXT                NOT NULL, \
+    title      TEXT                , \
+    message    TEXT                NOT NULL, \
+    options    TEXT                NOT NULL, \
+    remark     TEXT \
+    ); '   
+
+//todo
+var feedbackStr = 'CREATE TABLE IF NOT EXISTS feedbacks ( \
+    id         INT PRIMARY KEY     NOT NULL, \
+    user_name  TEXT                NOT NULL, \
+    time       TEXT                NOT NULL, \
+    title      TEXT                , \
+    message    TEXT                NOT NULL, \
+    options    TEXT                NOT NULL, \
+    remark     TEXT \
+    ); '   
+
+
+
+async function createTables() { 
+
+    client = await pool.connect();
+
+    var strArr = [adminStr, userStr]
+    
+    strArr.forEach(async function(v,i,_) {
+       var results = await client.query(v)
+    })
+
+}
+
+
+
+module.exports = {pgQuery, createTables};
 

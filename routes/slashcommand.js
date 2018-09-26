@@ -8,8 +8,14 @@ router.get('/test', (req, res) => {
     res.send("slash command get test response!");
 });
 
+
 router.post('/admin/init', admin_controller.init);
 
-router.post('/admin/roles', admin_controller.roles);
+router.post('/admin/add', admin_controller.add);
+
+router.post('/admin/delete', admin_controller.delete);
+
+router.post('/admin/list', admin_controller.list);
+
 
 module.exports = router;

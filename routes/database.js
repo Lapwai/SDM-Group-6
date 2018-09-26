@@ -27,6 +27,7 @@ var adminStr = 'CREATE TABLE IF NOT EXISTS admin ( \
 var userStr = 'CREATE TABLE IF NOT EXISTS roles ( \
     user_id    TEXT PRIMARY KEY    NOT NULL, \
     user_name  TEXT                NOT NULL, \
+    real_name  TEXT                NOT NULL, \
     role       TEXT                NOT NULL \
     ); '
 

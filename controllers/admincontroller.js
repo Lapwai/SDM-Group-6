@@ -16,6 +16,8 @@ exports.init = function(req, res) {
                 var insert = db.pgQuery(insertStr)
                 insert.then((insertValue) => {
                     res.send('Success: Worksapce ' + team_domain + '\'s new app \'Happiness Level\' init success!')
+                }).catch((err) => {
+                    res.send(err.message);
                 })
             } else {
                 res.send('Error: Workspace ' + team_domain + ' already init!')
@@ -46,18 +48,29 @@ exports.add = function(req, res) {
             return
         }
 
-
-        // If the xoxp token was revoked, go to legacy tokens generate a new one.
         params.splice(0,1)
-        var url = 'https://slack.com/api/users.list?token=xoxp-434508566676-434711974866-445031849590-92048d3bd57bdc16595d6f1f271fc73f'
-        request(url, { json: true }, (err, _, body) => {
-            if(err || body['error']) {
-                res.send(err || body['error']);
+        var options = {
+            url: 'https://slack.com/api/users.list?token=xoxa-2-434508566676-445609127334-444065434292-a41d63c89c65b7a2a9bacc9bfe61faa4&scope=users:read',
+            headers: {
+                'User-Agent': 'SDM Test'
+            }
+        };
+
+        request(options, (err, _, body) => {
+            var result = {}
+            if((typeof body) === 'string') {
+                result = JSON.parse(body)
+            } else {
+                result = body
+            }
+            if(err || result['error']) {
+                res.send(err || result['error']);
                 return
             }
+            
             var dict = []
+            var members = result['members']
 
-            var members = body['members']
             for(let i = 0; i<members.length; i++) {
                 for(let j = 0; j<params.length; j++) {
                     if(params[j].substring(1) == members[i]['name']) {
@@ -69,7 +82,7 @@ exports.add = function(req, res) {
                             temp.push(display_name)
                         }
                         dict.push(temp)
-                        return
+                        break;
                     }
                 }
             }
@@ -98,6 +111,8 @@ exports.add = function(req, res) {
             var insert = db.pgQuery(insertStr)
             insert.then((insertValue) => {
                 res.send('Success: Add success!');
+            }).catch((err) => {
+                res.send(err.message);
             })
         })
         
@@ -148,6 +163,7 @@ exports.list = function(req, res) {
         })
     })
 }
+
 
 function varifyAdmin(user_id) {
     var results = db.pgQuery('SELECT user_id FROM admin')

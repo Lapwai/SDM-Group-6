@@ -36,19 +36,19 @@ exports.add = function(req, res) {
             return
         }
 
-        var params = req.body.text.split(' ')
-        if(params.length < 2) {
+        var users = req.body.text.split(' ')
+        if(users.length < 2) {
             res.send('Error: Please input correct command!')
             return
         }
     
-        var role = params[0]
+        var role = users[0]
         if(role !== 'researcher' && role !== 'manager') {
             res.send('Error: Please input correct role!');
             return
         }
 
-        params.splice(0,1)
+        users.splice(0,1)
         var options = {
             url: 'https://slack.com/api/users.list?token=xoxa-2-434508566676-445609127334-444065434292-a41d63c89c65b7a2a9bacc9bfe61faa4&scope=users:read',
             headers: {
@@ -72,8 +72,8 @@ exports.add = function(req, res) {
             var members = result['members']
 
             for(let i = 0; i<members.length; i++) {
-                for(let j = 0; j<params.length; j++) {
-                    if(params[j].substring(1) == members[i]['name']) {
+                for(let j = 0; j<users.length; j++) {
+                    if(users[j].substring(1) == members[i]['name']) {
                         let temp = [members[i]['id'],members[i]['name']]
                         var display_name = members[i]['profile']['display_name']
                         if(display_name.length == 0) {
@@ -87,27 +87,11 @@ exports.add = function(req, res) {
                 }
             }
 
-            // members.forEach((element) => {
-            //     params.forEach( (para) => {
-            //         if(para.substring(1) == element['name']) {
-            //             let temp = [element['id'],element['name']]
-            //             var display_name = element['profile']['display_name']
-            //             if(display_name.length == 0) {
-            //                 temp.push(element['profile']['real_name'])
-            //             } else {
-            //                 temp.push(display_name)
-            //             }
-            //             dict.push(temp)
-            //             return
-            //         }
-            //     })
-            // });
-
             var insertStr = 'INSERT INTO roles(user_id, user_name, real_name, role) VALUES '
             dict.forEach( (e) => {
-                insertStr = insertStr + '(\'' + e[0] + '\',\'' + e[1] + '\',\'' + e[2] + '\',\'' + role + '\'), '
+                insertStr = insertStr + '(\'' + e[0] + '\',\'' + e[1] + '\',\'' + e[2] + '\',\'' + role + '\'),'
             })
-            insertStr = insertStr.substring(0, insertStr.length-2)
+            insertStr = insertStr.substring(0, insertStr.length-1)
             var insert = db.pgQuery(insertStr)
             insert.then((insertValue) => {
                 res.send('Success: Add success!');
@@ -120,11 +104,29 @@ exports.add = function(req, res) {
 }
 
 exports.delete = function(req, res) {
-    // var isAdmin = varifyAdmin();
-    // if(isAdmin[0] === false) {
-    //     res.send(isAdmin[1]);
-    //     return
-    // }
+    var isAdmin = varifyAdmin(req.body.user_id);
+    isAdmin.then((value) => {
+        if(value[0] === false) {
+            res.send(isAdmin[1]);
+            return
+        }
+
+        var users = req.body.text.split(' ')
+        var deleteStr = 'DELETE FROM roles WHERE user_name IN ('
+
+        for(let i = 0; i<users.length; i++) {
+           let user_name = users[i].substring(1)
+           deleteStr = deleteStr.concat('\'', user_name, '\'', ',')
+        }
+        deleteStr = deleteStr.substring(0, deleteStr.length-1).concat(');')
+        console.log(deleteStr)
+        let result = db.pgQuery(deleteStr)
+        result.then( (deleteValue) => {
+            res.send("Success: Delete success!");
+        }).catch( (err) => {
+            res.send(err.message);
+        })
+    })
 }
 
 exports.list = function(req, res) {
@@ -160,6 +162,8 @@ exports.list = function(req, res) {
             }
 
             res.send(JSON.stringify(responseObject));
+        }).catch((err) => {
+            res.send(err.message);
         })
     })
 }

@@ -70,7 +70,7 @@ exports.add = function(req, res) {
             
             var dict = []
             var members = result['members']
-
+            
             for(let i = 0; i<members.length; i++) {
                 for(let j = 0; j<users.length; j++) {
                     if(users[j].substring(1) == members[i]['name']) {
@@ -87,11 +87,19 @@ exports.add = function(req, res) {
                 }
             }
 
+            // if(dict.length === 0) {
+            //     res.send(value);
+            //     return
+            // }
+
             var insertStr = 'INSERT INTO roles(user_id, user_name, real_name, role) VALUES '
             dict.forEach( (e) => {
                 insertStr = insertStr + '(\'' + e[0] + '\',\'' + e[1] + '\',\'' + e[2] + '\',\'' + role + '\'),'
             })
             insertStr = insertStr.substring(0, insertStr.length-1)
+
+
+
             var insert = db.pgQuery(insertStr)
             insert.then((insertValue) => {
                 res.send('Success: Add success!');
@@ -119,9 +127,9 @@ exports.delete = function(req, res) {
            deleteStr = deleteStr.concat('\'', user_name, '\'', ',')
         }
         deleteStr = deleteStr.substring(0, deleteStr.length-1).concat(');')
-        console.log(deleteStr)
         let result = db.pgQuery(deleteStr)
         result.then( (deleteValue) => {
+            console.log(deleteValue)
             res.send("Success: Delete success!");
         }).catch( (err) => {
             res.send(err.message);
@@ -168,6 +176,9 @@ exports.list = function(req, res) {
     })
 }
 
+function finalRes(res) {
+
+}
 
 function varifyAdmin(user_id) {
     var results = db.pgQuery('SELECT user_id FROM admin')

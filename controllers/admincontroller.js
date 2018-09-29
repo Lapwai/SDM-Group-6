@@ -160,7 +160,7 @@ exports.list = function(req, res) {
                     }
                 ]
             }
-
+            res.setHeader('content-type', 'application/json');
             res.send(JSON.stringify(responseObject));
         }).catch((err) => {
             res.send(err.message);

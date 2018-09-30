@@ -31,6 +31,7 @@ exports.init = function(req, res) {
 exports.add = function(req, res) {
     var isAdmin = varifyAdmin(req.body.user_id);
     isAdmin.then((value) => {
+
         if(value[0] === false) {
             res.send(isAdmin[1]);
             return
@@ -104,6 +105,7 @@ exports.add = function(req, res) {
             insert.then((insertValue) => {
                 res.send('Success: Add success!');
             }).catch((err) => {
+                console.log(err.message)
                 res.send(err.message);
             })
         })
@@ -128,6 +130,7 @@ exports.delete = function(req, res) {
         }
         deleteStr = deleteStr.substring(0, deleteStr.length-1).concat(');')
         let result = db.pgQuery(deleteStr)
+
         result.then( (deleteValue) => {
             console.log(deleteValue)
             res.send("Success: Delete success!");
@@ -141,16 +144,17 @@ exports.list = function(req, res) {
     var isAdmin = varifyAdmin(req.body.user_id);
     isAdmin.then((value) => {
         if(value[0] === false) {
-            res.send(isAdmin[1]);
+            res.send(value[1]);
             return
         }
-        var text = req.body.text
+        var text = req.body.text.trim()
         if(text !== 'researcher' && text !== 'manager') {
             res.send('Error: Please input correct role!');
             return
         }
         var selectStr = 'SELECT * FROM roles WHERE role=\''+ text +'\';';
         var select = db.pgQuery(selectStr)
+
         select.then((selectValue) => {
             var names = ''
             selectValue.rows.forEach((e) => {
@@ -181,18 +185,23 @@ function finalRes(res) {
 }
 
 function varifyAdmin(user_id) {
-    var results = db.pgQuery('SELECT user_id FROM admin')
-    if(results.rowCount == 0) {
-        return new Promise.resolve([false, 'Error: Workspace needs init first!'])
-    } else {
-        return results.then((value) => {
-            if(user_id !== value.rows[0]['user_id']) {
-                return [false, 'Error: Only Admin can handle this command!']
+    return new Promise(function(resolve, reject) {
+        var results = db.pgQuery('SELECT user_id FROM admin;')
+        results.then( value => {
+            if(value.rowCount === 0) {
+                resolve([false, 'Error: Workspace needs init first!'])
             } else {
-                return [true]
+                if(user_id !== value.rows[0]['user_id']) {
+                    resolve([false, 'Error: Only Admin can handle this command!'])
+                } else {
+                    resolve([true])
+                }
             }
+        }).catch(error => {
+            resolve([false, error])
         })
-    }
+    })
+
 
 }
 

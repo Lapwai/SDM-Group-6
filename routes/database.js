@@ -5,14 +5,46 @@ const pool = new Pool({
                       ssl: false
                       });
 
+pool.on('error', (err, client) => {
+  console.error('Unexpected error on idle client', err)
+  process.exit(-1)
+})
+
+// // async/await - check out a client
+// (async () => {
+//   const client = await pool.connect()
+//   try {
+//     const res = await client.query('SELECT * FROM users WHERE id = $1', [1])
+//     console.log(res.rows[0])
+//   } finally {
+//     client.release()
+//   }
+// })().catch(e => console.log(e.stack))
+
+
 
 async function pgQuery(queryStr) {
-    //console.log(queryStr)
-    const client = await pool.connect();
-    //console.log(1)
-    const results = await client.query(queryStr);
-    //console.log(2)
-    return results
+
+    return new Promise(function(resolve, reject) {
+        pool.connect()
+        .then(client => {
+            return client.query(queryStr)
+            .then(res => {
+                client.release()
+                resolve(res)
+            })
+            .catch(e => {
+                client.release()
+                reject(e.message)
+            })
+        })
+
+    })
+
+
+    // const client = await pool.connect();
+    // const results = client.query(queryStr);
+    // return results
 }
 
 

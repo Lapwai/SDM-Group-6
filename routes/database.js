@@ -40,7 +40,7 @@ var roleStr = 'CREATE TABLE IF NOT EXISTS roles ( \
     role       TEXT                NOT NULL \
     ); '
 
-var surveyStr = 'CREATE TABLE IF NOT EXISTS surveies ( \
+var surveyStr = 'CREATE TABLE IF NOT EXISTS survey ( \
     survey_id   INT PRIMARY KEY     NOT NULL, \
     user_id     TEXT                NOT NULL, \
     user_role   TEXT                NOT NULL, \

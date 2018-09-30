@@ -1,4 +1,3 @@
-
 const { Pool } = require('pg');
 const pool = new Pool({
                       connectionString: process.env.DATABASE_URL ,
@@ -10,21 +9,7 @@ pool.on('error', (err, client) => {
   process.exit(-1)
 })
 
-// // async/await - check out a client
-// (async () => {
-//   const client = await pool.connect()
-//   try {
-//     const res = await client.query('SELECT * FROM users WHERE id = $1', [1])
-//     console.log(res.rows[0])
-//   } finally {
-//     client.release()
-//   }
-// })().catch(e => console.log(e.stack))
-
-
-
 async function pgQuery(queryStr) {
-
     return new Promise(function(resolve, reject) {
         pool.connect()
         .then(client => {
@@ -38,16 +23,8 @@ async function pgQuery(queryStr) {
                 reject(e.message)
             })
         })
-
     })
-
-
-    // const client = await pool.connect();
-    // const results = client.query(queryStr);
-    // return results
 }
-
-
 
 
 
@@ -56,48 +33,43 @@ var adminStr = 'CREATE TABLE IF NOT EXISTS admin ( \
     user_name  TEXT                NOT NULL \
     ); '
 
-var userStr = 'CREATE TABLE IF NOT EXISTS roles ( \
+var roleStr = 'CREATE TABLE IF NOT EXISTS roles ( \
     user_id    TEXT PRIMARY KEY    NOT NULL, \
     user_name  TEXT                NOT NULL, \
     real_name  TEXT                NOT NULL, \
     role       TEXT                NOT NULL \
     ); '
 
-var notificationStr = 'CREATE TABLE IF NOT EXISTS notifications ( \
-    not_id     INT PRIMARY KEY     NOT NULL, \
-    user_name  TEXT                NOT NULL, \
-    time       TEXT                NOT NULL, \
-    title      TEXT                , \
-    message    TEXT                NOT NULL, \
-    options    TEXT                NOT NULL, \
-    remark     TEXT \
+var surveyStr = 'CREATE TABLE IF NOT EXISTS surveies ( \
+    survey_id   INT PRIMARY KEY     NOT NULL, \
+    user_id     TEXT                NOT NULL, \
+    user_role   TEXT                NOT NULL, \
+    survey_name TEXT                NOT NULL, \
+    time        TEXT                NOT NULL, \
+    title       TEXT                NOT NULL, \
+    message     TEXT                NOT NULL, \
+    active      BOOL                NOT NULL    DEFAULT  FALSE, \
+    remark      TEXT \
     ); '   
 
-//todo
 var feedbackStr = 'CREATE TABLE IF NOT EXISTS feedbacks ( \
-    id         INT PRIMARY KEY     NOT NULL, \
-    user_name  TEXT                NOT NULL, \
-    time       TEXT                NOT NULL, \
-    title      TEXT                , \
-    message    TEXT                NOT NULL, \
-    options    TEXT                NOT NULL, \
+    fb_id      INT PRIMARY KEY     NOT NULL, \
+    user_id    TEXT                NOT NULL, \
+    ts         timestamp           NOT NULL, \
+    option     TEXT                NOT NULL, \
     remark     TEXT \
     ); '   
-
-
 
 async function createTables() { 
 
     client = await pool.connect();
 
-    var strArr = [adminStr, userStr]
+    var strArr = [adminStr, roleStr, surveyStr, feedbackStr]
     
     strArr.forEach(async function(v,i,_) {
        var results = await client.query(v)
     })
-
 }
-
 
 
 module.exports = {pgQuery, createTables};

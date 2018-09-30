@@ -3,6 +3,7 @@
 var app = require('../app')
 var db = require('../routes/database')
 var request = require('request')
+var textRes = require('./textresponse')
 
 exports.init = function(req, res) {
     var results = db.pgQuery('SELECT * FROM admin')
@@ -15,12 +16,12 @@ exports.init = function(req, res) {
                 var insertStr =  'INSERT INTO admin (user_id, user_name) VALUES('+ user_id + ',' + user_name + ')'
                 var insert = db.pgQuery(insertStr)
                 insert.then((insertValue) => {
-                    res.send('Success: Worksapce ' + team_domain + '\'s new app \'Happiness Level\' init success!')
+                    textRes.textRes(res,false,'Worksapce ' + team_domain + '\'s new app \'Happiness Level\' init success!')
                 }).catch((err) => {
-                    res.send(err.message);
+                    textRes.textRes(res,true,err)
                 })
             } else {
-                res.send('Error: Workspace ' + team_domain + ' already init!')
+                textRes.textRes(res,true,'Workspace ' + team_domain + ' already init!')
             }
 
         });
@@ -29,23 +30,12 @@ exports.init = function(req, res) {
 
 
 exports.add = function(req, res) {
-    var isAdmin = varifyAdmin(req.body.user_id);
+    var isAdmin = verifyAdmin(req.body.user_id);
     isAdmin.then((value) => {
-
-        if(value[0] === false) {
-            res.send(isAdmin[1]);
-            return
-        }
-
         var users = req.body.text.split(' ')
-        if(users.length < 2) {
-            res.send('Error: Please input correct command!')
-            return
-        }
-    
         var role = users[0]
-        if(role !== 'researcher' && role !== 'manager') {
-            res.send('Error: Please input correct role!');
+        if(users.length < 2 || (role !== 'researcher' && role !== 'manager')) {
+            textRes.textRes(res,true,'Please input correct command! \n //add researcher/manager @user1 @user2 ...')
             return
         }
 
@@ -65,7 +55,7 @@ exports.add = function(req, res) {
                 result = body
             }
             if(err || result['error']) {
-                res.send(err || result['error']);
+                textRes.textRes(res,true,(err || result['error']))
                 return
             }
             
@@ -75,6 +65,7 @@ exports.add = function(req, res) {
             for(let i = 0; i<members.length; i++) {
                 for(let j = 0; j<users.length; j++) {
                     if(users[j].substring(1) == members[i]['name']) {
+                        // todo
                         let temp = [members[i]['id'],members[i]['name']]
                         var display_name = members[i]['profile']['display_name']
                         if(display_name.length == 0) {
@@ -88,10 +79,10 @@ exports.add = function(req, res) {
                 }
             }
 
-            // if(dict.length === 0) {
-            //     res.send(value);
-            //     return
-            // }
+            if(dict.length === 0) {
+                textRes.textRes(res,true,'Did not find the member!')
+                return
+            }
 
             var insertStr = 'INSERT INTO roles(user_id, user_name, real_name, role) VALUES '
             dict.forEach( (e) => {
@@ -99,28 +90,21 @@ exports.add = function(req, res) {
             })
             insertStr = insertStr.substring(0, insertStr.length-1)
 
-
-
             var insert = db.pgQuery(insertStr)
             insert.then((insertValue) => {
-                res.send('Success: Add success!');
+                textRes.textRes(res,false,'Add success!')
             }).catch((err) => {
-                console.log(err.message)
-                res.send(err.message);
+                textRes.textRes(res,true,err)
             })
         })
-        
+    }).catch(err => {
+        textRes.textRes(res,true,err)
     })
 }
 
 exports.delete = function(req, res) {
-    var isAdmin = varifyAdmin(req.body.user_id);
+    var isAdmin = verifyAdmin(req.body.user_id);
     isAdmin.then((value) => {
-        if(value[0] === false) {
-            res.send(isAdmin[1]);
-            return
-        }
-
         var users = req.body.text.split(' ')
         var deleteStr = 'DELETE FROM roles WHERE user_name IN ('
 
@@ -132,24 +116,21 @@ exports.delete = function(req, res) {
         let result = db.pgQuery(deleteStr)
 
         result.then( (deleteValue) => {
-            console.log(deleteValue)
-            res.send("Success: Delete success!");
+            textRes.textRes(res,false,'Delete success!')
         }).catch( (err) => {
-            res.send(err.message);
+            textRes.textRes(res,true,err)
         })
+    }).catch(err => {
+        textRes.textRes(res,true,err)
     })
 }
 
 exports.list = function(req, res) {
-    var isAdmin = varifyAdmin(req.body.user_id);
+    var isAdmin = verifyAdmin(req.body.user_id);
     isAdmin.then((value) => {
-        if(value[0] === false) {
-            res.send(value[1]);
-            return
-        }
         var text = req.body.text.trim()
         if(text !== 'researcher' && text !== 'manager') {
-            res.send('Error: Please input correct role!');
+            textRes.textRes(res,true,'Please input correct role! \n //list researcher/manager')
             return
         }
         var selectStr = 'SELECT * FROM roles WHERE role=\''+ text +'\';';
@@ -160,49 +141,32 @@ exports.list = function(req, res) {
             selectValue.rows.forEach((e) => {
                 names = names + e['real_name'] + '\n'
             })
-            var responseObject = {
-                'attachments': [
-                    {
-                        'pretext': 'List result - ' + text,
-                        'text': names ,
-                        'mrkdwn_in': [
-                            'text',
-                            'pretext'
-                        ]
-                    }
-                ]
-            }
-            res.setHeader('content-type', 'application/json');
-            res.send(JSON.stringify(responseObject));
+            textRes.textRes(res,false,'List result\n' + names)
         }).catch((err) => {
-            res.send(err.message);
+            textRes.textRes(res,true,err)
         })
+    }).catch(err => {
+        textRes.textRes(res,true,err)
     })
 }
 
-function finalRes(res) {
-
-}
-
-function varifyAdmin(user_id) {
-    return new Promise(function(resolve, reject) {
+function verifyAdmin(user_id) {
+    return new Promise((resolve, reject) => {
         var results = db.pgQuery('SELECT user_id FROM admin;')
         results.then( value => {
             if(value.rowCount === 0) {
-                resolve([false, 'Error: Workspace needs init first!'])
+                reject('Workspace needs init first!')
             } else {
                 if(user_id !== value.rows[0]['user_id']) {
-                    resolve([false, 'Error: Only Admin can handle this command!'])
+                    reject('Only Admin can handle this command!')
                 } else {
-                    resolve([true])
+                    resolve('')
                 }
             }
         }).catch(error => {
-            resolve([false, error])
+            reject(error)
         })
     })
-
-
 }
 
 

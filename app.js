@@ -7,7 +7,6 @@ var bodyParser = require('body-parser');
 
 
 var index = require('./routes/index');
-var chatbot = require('./routes/chatbot')
 var slashcommand = require('./routes/slashcommand');
 var db = require('./routes/database')
 var helmet = require('helmet');
@@ -38,7 +37,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Important parts
 app.use('/', index);
 app.use('/slashcommand', slashcommand)
-//chatbot.chatbot();
 db.createTables();
 
 

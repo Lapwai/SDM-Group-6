@@ -39,7 +39,7 @@ function verifyRole(user_id) {
             if(value.rowCount === 0) {
                 reject('')
             } else {
-                resolve(value.rowCount)
+                resolve(value.rows)
             }
         }).catch(err => {
             reject(err)

@@ -141,7 +141,7 @@ exports.list = function(req, res) {
             selectValue.rows.forEach((e) => {
                 names = names + e['real_name'] + '\n'
             })
-            textRes.textRes(res,false,'List result\n' + names)
+            textRes.textRes(res,false,text + ':\n' + names)
         }).catch((err) => {
             textRes.textRes(res,true,err)
         })

@@ -5,7 +5,7 @@ function textRes(res,error,text) {
         'attachments': [{
             "fallback": "Required plain-text summary of the attachment.",
             "color": (error == true) ? 'danger' : "good",          
-            "title": (error == true) ? '*Error*' : '*Success*',
+            "title": (error == true) ? ':hankey: *Error* ' : ':tada: *Success* ',
             "text": text,
             "attachment_type": "default",
             "mrkdwn_in": ["title", "text"],

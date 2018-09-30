@@ -35,7 +35,7 @@ exports.add = function(req, res) {
         var users = req.body.text.split(' ')
         var role = users[0]
         if(users.length < 2 || (role !== 'researcher' && role !== 'manager')) {
-            textRes.textRes(res,true,'Please input correct command! \n //add researcher/manager @user1 @user2 ...')
+            textRes.textRes(res,true,'Please input correct command! \n _/admin_add researcher/manager @user1 @user2 ... _')
             return
         }
 
@@ -65,7 +65,6 @@ exports.add = function(req, res) {
             for(let i = 0; i<members.length; i++) {
                 for(let j = 0; j<users.length; j++) {
                     if(users[j].substring(1) == members[i]['name']) {
-                        // todo
                         let temp = [members[i]['id'],members[i]['name']]
                         var display_name = members[i]['profile']['display_name']
                         if(display_name.length == 0) {
@@ -130,7 +129,7 @@ exports.list = function(req, res) {
     isAdmin.then((value) => {
         var text = req.body.text.trim()
         if(text !== 'researcher' && text !== 'manager') {
-            textRes.textRes(res,true,'Please input correct role! \n //list researcher/manager')
+            textRes.textRes(res,true,'Please input correct role! \n _/admin_list researcher/manager_')
             return
         }
         var selectStr = 'SELECT * FROM roles WHERE role=\''+ text +'\';';
@@ -141,7 +140,7 @@ exports.list = function(req, res) {
             selectValue.rows.forEach((e) => {
                 names = names + e['real_name'] + '\n'
             })
-            textRes.textRes(res,false,text + ':\n' + names)
+            textRes.textRes(res,false,'*'+ text.substring(0,1).toUpperCase()+text.substring(1) + ': *\n' + names)
         }).catch((err) => {
             textRes.textRes(res,true,err)
         })

@@ -22,6 +22,8 @@ async function pgQuery(queryStr) {
                 client.release()
                 reject(e.message)
             })
+        }).catch(e => {
+            reject(e.message)
         })
     })
 }

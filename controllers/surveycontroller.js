@@ -1,12 +1,16 @@
 var app = require('../app')
 var db = require('../routes/database')
 var request = require('request')
+var textRes = require('./textresponse')
 
 
 // add a new survey
 exports.add = function(req, res) {
 
 
+
+
+    textRes.textRes(res,false,'')
 }
 
 // update survey status, isActive = 1/0

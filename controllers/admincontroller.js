@@ -27,6 +27,8 @@ exports.init = function(req, res) {
                 textRes.textRes(res,true,'Workspace ' + team_domain + ' already init!')
             }
 
+        }).catch(err => {
+            textRes.textRes(res,true,err.message||err)
         });
 }
 
@@ -58,10 +60,10 @@ exports.add = function(req, res) {
                 textRes.textRes(res,true,err)
             })
         }).catch(err => {
-            textRes.textRes(res,true,err)
+            textRes.textRes(res,true,err.message||err)
         })
     }).catch(err => {
-        textRes.textRes(res,true,err)
+        textRes.textRes(res,true,err.message||err)
     })
 }
 function addVerifyParams(users) {
@@ -142,10 +144,10 @@ exports.delete = function(req, res) {
         result.then( (deleteValue) => {
             textRes.textRes(res,false,'Delete success!')
         }).catch( (err) => {
-            textRes.textRes(res,true,err)
+            textRes.textRes(res,true,err.message||err)
         })
     }).catch(err => {
-        textRes.textRes(res,true,err)
+        textRes.textRes(res,true,err.message||err)
     })
 }
 function deleteGenerateSql(users) {
@@ -181,10 +183,10 @@ exports.list = function(req, res) {
             })
             textRes.textRes(res,false,'*'+ text.substring(0,1).toUpperCase()+text.substring(1) + ': *\n' + names)
         }).catch((err) => {
-            textRes.textRes(res,true,err)
+            textRes.textRes(res,true,err.message||err)
         })
     }).catch(err => {
-        textRes.textRes(res,true,err)
+        textRes.textRes(res,true,err.message||err)
     })
 }
 

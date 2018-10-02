@@ -43,7 +43,7 @@ var roleStr = 'CREATE TABLE IF NOT EXISTS roles ( \
     ); '
 
 var surveyStr = 'CREATE TABLE IF NOT EXISTS survey ( \
-    survey_id   INT PRIMARY KEY     NOT NULL, \
+    survey_id   TEXT PRIMARY KEY    NOT NULL, \
     user_id     TEXT                NOT NULL, \
     user_role   TEXT                NOT NULL, \
     survey_name TEXT                NOT NULL, \
@@ -63,7 +63,6 @@ var feedbackStr = 'CREATE TABLE IF NOT EXISTS feedbacks ( \
     ); '   
 
 async function createTables() { 
-
     client = await pool.connect();
 
     var strArr = [adminStr, roleStr, surveyStr, feedbackStr]

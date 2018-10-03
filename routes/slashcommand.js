@@ -24,15 +24,11 @@ router.post('/survey/add', survey_controller.add);
 
 router.post('/survey/set', survey_controller.set);
 
-router.post('/survey/list', survey_controller.surveylistForResearcherOrManager);
+router.post('/survey/list', survey_controller.list);
 
 router.post('/survey/view', survey_controller.view);
 
-//Personal suervey records
-router.post('/my_history', survey_controller.myHistory);
+
 
 
 module.exports = router;
-
-
-

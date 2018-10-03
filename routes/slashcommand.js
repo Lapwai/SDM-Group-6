@@ -24,10 +24,12 @@ router.post('/survey/add', survey_controller.add);
 
 router.post('/survey/set', survey_controller.set);
 
-router.post('/survey/list', survey_controller.list);
+router.post('/survey/list', survey_controller.surveylistForResearcherOrManager);
 
 router.post('/survey/view', survey_controller.view);
 
+//member results list
+router.post('/survey/my_History', survey_controller.myHistory);
 
 
 

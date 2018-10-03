@@ -1,13 +1,8 @@
 console.log("test begin");
 
-<<<<<<< HEAD
-var survey_controller = require('../controllers/surveycontroller');
-
-
-=======
 
 // var survey_controller = require('../controllers/surveycontroller');
->>>>>>> 10f066739253f22f1256a081f5a13358d457308a
+
 const expect = require('chai').expect
 
 describe('#surveycontroller.js', function() {

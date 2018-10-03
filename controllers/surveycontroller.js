@@ -96,8 +96,14 @@ function queryAllSurveyWithId(sql) {
 }
 function listSurveyOnebyOne(value){//List all survey one by one 
     var output=''
+    var active=''
     for(var i=0;i<value.rowCount;i++){
-        output =output+[value.rows[i]['survey_id'],value.rows[i]['survey_name']]+'\n'
+        if(value.rows[i]['active']==true){
+             active = 'Active'
+        }else{
+             active='Not Active'
+        }
+        output =output+[value.rows[i]['survey_id'],value.rows[i]['survey_name'],active]+'\n'
     } 
     return output
 }

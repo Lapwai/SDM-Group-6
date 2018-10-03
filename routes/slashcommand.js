@@ -29,6 +29,7 @@ router.post('/survey/list', survey_controller.surveylistForResearcherOrManager);
 
 router.post('/survey/view', survey_controller.view);
 
+<<<<<<< HEAD
 
 //Personal suervey records
 router.post('/my/history', my_controller.history);
@@ -37,6 +38,11 @@ router.post('/my/history', my_controller.history);
 
 
 module.exports = router;
+=======
+//member results list
+router.post('/survey/my_History', survey_controller.myHistory);
+>>>>>>> 10f066739253f22f1256a081f5a13358d457308a
 
 
 
+module.exports = router;

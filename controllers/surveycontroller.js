@@ -2,7 +2,6 @@ const app = require('../app')
 const db = require('../routes/database')
 const request = require('request')
 const textRes = require('./textresponse')
-const crypto = require('crypto');
 
 
 // add a new survey
@@ -43,10 +42,7 @@ function addVerifyParams(params) {
     return [true,'']
 }
 function addGenerateSql(body, role, params) {
-    let temp =  body.text + new Date().getTime()
-    let surveyID = crypto.createHash('md5').update(temp).digest('hex')
-    let time 
-    let str = 'INSERT INTO survey(survey_id, user_id, user_role, survey_name, time, title, message, active) VALUES (\'' + surveyID + '\',\'' + body.user_id + '\',\'' + role + '\',\'' + params[0] + '\',\'' +  params[1] + '\',\'' +  params[2] + '\',\'' +  params[3] + '\',' + 'false' + ');'
+    let str = 'INSERT INTO survey(survey_id, user_id, user_role, survey_name, time, title, message, active) VALUES (\'' + body.user_id + '\',\'' + role + '\',\'' + params[0] + '\',\'' +  params[1] + '\',\'' +  params[2] + '\',\'' +  params[3] + '\',' + 'false' + ');'
     return str
 }
 

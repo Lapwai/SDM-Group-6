@@ -43,7 +43,7 @@ var roleStr = 'CREATE TABLE IF NOT EXISTS roles ( \
     ); '
 
 var surveyStr = 'CREATE TABLE IF NOT EXISTS survey ( \
-    survey_id   TEXT PRIMARY KEY    NOT NULL, \
+    survey_id   SERIAL              PRIMARY KEY, \
     user_id     TEXT                NOT NULL, \
     user_role   TEXT                NOT NULL, \
     survey_name TEXT                NOT NULL, \

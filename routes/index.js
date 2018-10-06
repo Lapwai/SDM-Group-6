@@ -7,7 +7,7 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/para', (req, res) => {
-  res.send(req)
+  res.send(JSON.stringify(req))
 });
 
 module.exports = router;

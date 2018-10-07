@@ -4,7 +4,11 @@ const request = require('request')
 const textRes = require('./textresponse')
 
 exports.interactivity = function(req, res) {
+    console.log('enter')
     let type = req.body.payload.actions[0].type
+    console.log('enter+' + type +  '+type')
+    console.log('1' + req.body.payload)
+    console.log('2' + req.body['payload'])
     if(type === 'select') {
         console.log('select')
         generateSql(req.body).then(sqlStr => {

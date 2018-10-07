@@ -17,17 +17,20 @@ exports.add = function(req, res) {
             return
         }
         let hash = crypto.createHash('md5').update(new Date().toString()).digest('hex')
-        let insertStr = addGenerateSql(hash,req.body.user_id,value,params)
-        let insert = db.pgQuery(insertStr)
-        insert.then(_ => {
-            if(value == 'researcher') {
-                shcedule.add(hash,params)
-                textRes.successRes(res,'Add survey success!')
-            } else {
-                shcedule.post(hash,params)
-                textRes.successRes(res,'Add survey success!')
-            }
-        }).catch((err) => {
+        addGenerateSql(hash,req.body.user_id,value,params).then(value => {
+            let insert = db.pgQuery(value)
+            insert.then(_ => {
+                if(value == 'researcher') {
+                    shcedule.add(hash,params)
+                    textRes.successRes(res,'Add survey success!')
+                } else {
+                    shcedule.post(hash,params)
+                    textRes.successRes(res,'Add survey success!')
+                }
+            }).catch(err => {
+                textRes.errorRes(req,res,err.message||err)
+            })
+        }).catch(err => {
             textRes.errorRes(req,res,err.message||err)
         })
     }).catch(err => {

@@ -57,7 +57,7 @@ var surveyStr = 'CREATE TABLE IF NOT EXISTS survey ( \
     ); '   
 
 var feedbackStr = 'CREATE TABLE IF NOT EXISTS feedbacks ( \
-    id                TEXT PRIMARY KEY     NOT NULL, \
+    id                TEXT PRIMARY KEY    NOT NULL, \
     survey_id         INT4                NOT NULL, \
     member_id         TEXT                NOT NULL, \
     ts                timestamp           NOT NULL, \

@@ -17,15 +17,16 @@ exports.add = function(req, res) {
             return
         }
         let hash = crypto.createHash('md5').update(new Date().toString()).digest('hex')
-        addGenerateSql(hash,req.body.user_id,value,params).then(value => {
-            let insert = db.pgQuery(value)
-            insert.then(_ => {
+        addQueryChannelID(params[1]).then(channelID => {
+            let sqlStr = addGenerateSql(hash,req.body.user_id,value,params)
+            let insert = db.pgQuery(sqlStr)
+            insert.then(value => {
                 if(value == 'researcher') {
-                    shcedule.add(hash,params)
-                    textRes.successRes(res,'Add survey success!')
+                    shcedule.add(hash,params,channelID)
+                    textRes.successRes(res,'Researcher adds a survey success!')
                 } else {
-                    shcedule.post(hash,params)
-                    textRes.successRes(res,'Add survey success!')
+                    shcedule.post(hash,params,channelID)
+                    textRes.successRes(res,'Manager adds a survey success!')
                 }
             }).catch(err => {
                 textRes.errorRes(req,res,err.message||err)
@@ -56,21 +57,44 @@ function addVerifyParams(params) {
     return [true,'']
 }
 function addGenerateSql(hash, user_id, part, params) {
-    return new Promise(function(resolve, reject) {
-
-        let survey_name = params[0]
-        let survey_range = params[1]
-        let survey_time = params[2]
-        let survey_title = params[3]
-        let survey_message = params[4]
-
-        let str = 'INSERT INTO survey(hash, role_id, role_part, name, range, time, title, message, active) VALUES (\'' + hash + '\',\'' + user_id + '\',\'' + part + '\',\'' + survey_name + '\',\'' +  survey_range + '\',\'' +  survey_time + '\',\'' +  survey_title + '\',\'' +  survey_message + '\',' + 'false' + ');'
-        resolve(str)
-    })
-
-
+    let survey_name = params[0]
+    let survey_range = params[1]
+    let survey_time = params[2]
+    let survey_title = params[3]
+    let survey_message = params[4]
+    let str = 'INSERT INTO survey(hash, role_id, role_part, name, range, time, title, message, active) VALUES (\'' + hash + '\',\'' + user_id + '\',\'' + part + '\',\'' + survey_name + '\',\'' +  survey_range + '\',\'' +  survey_time + '\',\'' +  survey_title + '\',\'' +  survey_message + '\',' + 'false' + ');'
+    return str
 }
-
+function addQueryChannelID(name) {
+    return new Promise(function(resolve, reject) {
+        let options = {
+            url: 'https://slack.com/api/conversations.list?token=xoxa-2-434508566676-445609127334-444065434292-a41d63c89c65b7a2a9bacc9bfe61faa4&scope=conversations:read',
+            headers: {'User-Agent': 'SDM Test'}
+        };
+        request(options, (err, _, body) => {
+            let result = {}
+            if((typeof body) === 'string') {
+                result = JSON.parse(body)
+            } else {
+                result = body
+            }            
+            if(err || result['error']) {
+                reject(err || result['error'])
+            }
+            let channelID = ''
+            result['channels'].forEach(e => {
+                if(name.substring(1) == e['name']) {
+                    channelID = e['id']
+                }
+            })
+            if(channelID.length === 0){
+                reject('Did not find the channel!')
+            } else {
+                resolve(channelID)
+            }
+        }) 
+    })
+}
 
 
 

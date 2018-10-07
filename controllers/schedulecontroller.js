@@ -4,7 +4,7 @@ const request = require('request')
 const schedule = require('node-schedule')
 
 // add schedule for researcher
-function add(params) {
+function add(hash,params,channelID) {
     let survey_name = params[0]
     let survey_range = params[1]
     let survey_time = params[2].split(':')
@@ -18,51 +18,12 @@ function add(params) {
 }
 
 // post survey
-function post(hash,params) {
-    let survey_range = params[1]
-    let survey_title = params[3]
-    let survey_message = params[4]
-    
-    let attachments = [{
-        'fallback': 'Required plain-text summary of the attachment.',
-        'callback_id': hash,
-        'color': '#539BD8',          
-        'pretext': ':mag: *Survey*',
-        'text': '*' + survey_title + '* \n' + survey_message,
-        'attachment_type': 'default',
-        'actions':[
-            {
-                'name': 'schedule-researcher',
-                'text': '1',
-                'type': 'button',
-                'value': '1'
-            },{
-                'name': 'schedule-researcher',
-                'text': '2',
-                'type': 'button',
-                'value': '2'
-            },{
-                'name': 'schedule-researcher',
-                'text': '3',
-                'type': 'button',
-                'value': '3'
-            },{
-                'name': 'schedule-researcher',
-                'text': '4',
-                'type': 'button',
-                'value': '4'
-            },{
-                'name': 'schedule-researcher',
-                'text': '5',
-                'type': 'button',
-                'value': '5'
-            }],
-        'mrkdwn_in': ['text','pretext'],
-    }]
-
+function post(hash,params,channelID) {
+    let attachments = gengerateAttachment(hash,params)
     let bodyParams = {'scope':'chat:write',
-                'channel': survey_range.substring(1),
+                'channel': channelID,
                 'text': '',
+                'response_type' : 'in_channel',
                 'attachments': attachments}
     let options = {
         url: 'https://slack.com/api/chat.postMessage',
@@ -75,18 +36,100 @@ function post(hash,params) {
         body: JSON.stringify(bodyParams)
     };
 
-    function callBack(error, response, body) {
+    function callBack(error, _, _) {
         if(error) {
-            console.log('error = ')
             console.log(error)
         } else {
-            console.log('body')
-            console.log(body)
+            console.log('post survey success')
         }
     }
-
     request(options, callBack)
 }
+function queryChannelID(name) {
+    return new Promise(function(resolve, reject) {
+        let options = {
+            url: 'https://slack.com/api/conversations.list?token=xoxa-2-434508566676-445609127334-444065434292-a41d63c89c65b7a2a9bacc9bfe61faa4&scope=conversations:read',
+            headers: {'User-Agent': 'SDM Test'}
+        };
+        request(options, (err, _, body) => {
+            let result = {}
+            if((typeof body) === 'string') {
+                result = JSON.parse(body)
+            } else {
+                result = body
+            }            
+            if(err || result['error']) {
+                reject(err || result['error'])
+            }
+            let channelID = ''
+            result['channels'].forEach(e => {
+                if(name.substring(1) == e['name']) {
+                    channelID = e['id']
+                }
+            })
+            if(channelID.length === 0){
+                reject('Did not find the channel!')
+            } else {
+                resolve(channelID)
+            }
+        }) 
+    })
+}
+
+function gengerateAttachment(hash,params) {
+    let survey_title = params[3]
+    let survey_message = params[4]
+    let attachments = [{
+        "fallback" : "You can not user this feature!",
+        "mrkdwn_in" : ["pretext","text"],
+        "pretext" : ":mag: *Survey*",
+        'text': '*' + survey_title + '* \n' + survey_message,
+        "color" : "#3AA3E3",
+        "attachment_type" : "default",
+        'callback_id': hash,
+        "actions" : [{
+            "name" : "happy list",
+            "text" : "Pick a happiness level...",
+            "type" : "select",
+            "options" : [{
+                    "text" : "Very unhappy",
+                    "value" : "1"
+                },{
+                    "text" : "Unhappy",
+                    "value" : "2"
+                },{
+                    "text" : "General",
+                    "value" : "3"
+                },{
+                    "text" : "Happy",
+                    "value" : "4"
+                },{
+                    "text" : "Very happy",
+                    "value" : "5"
+                }]
+            }]
+        },{
+            "fallback" : "You can not user this feature!",
+            "color" : "#DDDDDD",
+            "attachment_type" : "default",
+            'callback_id': hash,
+            "actions" : [{
+                "name" : "reminder",
+                "text" : "Reminder me later",
+                "type" : "button",
+                "style" : "#DDDDDD",
+                "value" : "1",
+                "confirm" : {
+                    "text" : "Are you sure?",
+                    "ok_text" : "Yes",
+                    "dismiss_text" : "No"
+                }
+            }]
+        }
+    ]
+    return attachments
+}
+
 
 // run 
 function runloop() {

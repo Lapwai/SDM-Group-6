@@ -4,11 +4,7 @@ const request = require('request')
 const textRes = require('./textresponse')
 
 exports.interactivity = function(req, res) {
-
-    res.send('got it');
-
-    
-
+    res.send(JSON.stringify(req.body));
 }
 
 

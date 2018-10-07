@@ -4,18 +4,13 @@ const request = require('request')
 const textRes = require('./textresponse')
 
 exports.interactivity = function(req, res) {
-    console.log('enter')
-    console.log('1' + req.body.payload)
-    console.log('2' + req.body['payload'])
-    console.log('3' + req.body.payload.actions)
-    console.log('4' + req.body['payload']['actions'])
-
-    let type = req.body.payload.actions[0].type
+    let payload = JSON.parse(req.body.payload)
+    console.log(payload)
+    let type = payload.actions[0].type
     console.log('enter+' + type +  '+type')
-
     if(type === 'select') {
         console.log('select')
-        generateSql(req.body).then(sqlStr => {
+        generateSql(payload).then(sqlStr => {
             console.log(sqlStr)
             db.pgQuery(sqlStr).then(_ => {
                 console.log('pg query success')
@@ -33,20 +28,20 @@ exports.interactivity = function(req, res) {
     }
 }
 
-function generateSql(body) {
+function generateSql(payload) {
     return new Promise((resolve, reject) => {
-        let callback_id = body.payload.callback_id
+        let callback_id = payload.callback_id
         db.pgQuery('SELECT * FROM survey WHERE hash = \'' + callback_id + '\';')
         .then(survey_ids => {
             if(survey_ids.rowCount === 0) {
                 reject('Did not find the survey!')
             }
             let survey_id = survey_ids.rows[0]['id']
-            let member_id = body.payload.user.id
-            let channel_id = body.payload.channel.name
-            let channel_name = body.payload.channel.id
+            let member_id = payload.user.id
+            let channel_id = payload.channel.name
+            let channel_name = payload.channel.id
             let ts = '\'now\''
-            let option = body.payload.actions[0].selected_options[0].value
+            let option = payload.actions[0].selected_options[0].value
 
             let str = 'INSERT INTO feedbacks(survey_id,member_id,channel_id,channel_name,ts,option) VALUES (';
             str = str.concat(survey_id,',',member_id,',',channel_id,',',channel_name,',',ts,',',option,');')

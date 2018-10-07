@@ -18,7 +18,7 @@ exports.add = function(req, res) {
         }
         let hash = crypto.createHash('md5').update(new Date().toString()).digest('hex')
         addQueryChannelID(params[1]).then(channelID => {
-            let sqlStr = addGenerateSql(hash,req.body.user_id,value,params,channelID)
+            let sqlStr = addGenerateSql(hash,req.body.user_id,value.rows[0].part,params,channelID)
             let insert = db.pgQuery(sqlStr)
             insert.then(value => {
                 if(value == 'researcher') {

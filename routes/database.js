@@ -31,33 +31,31 @@ async function pgQuery(queryStr) {
 
 
 var adminStr = 'CREATE TABLE IF NOT EXISTS admin ( \
-    id         TEXT PRIMARY KEY    NOT NULL, \
-    name       TEXT                NOT NULL \
+    user_id    TEXT PRIMARY KEY    NOT NULL, \
+    user_name  TEXT                NOT NULL \
     ); '
 
-var roleStr = 'CREATE TABLE IF NOT EXISTS role ( \
-    id         TEXT PRIMARY KEY    NOT NULL, \
-    name       TEXT                NOT NULL, \
+var roleStr = 'CREATE TABLE IF NOT EXISTS roles ( \
+    user_id    TEXT PRIMARY KEY    NOT NULL, \
+    user_name  TEXT                NOT NULL, \
     real_name  TEXT                NOT NULL, \
-    part       TEXT                NOT NULL \
+    role       TEXT                NOT NULL \
     ); '
 
 var surveyStr = 'CREATE TABLE IF NOT EXISTS survey ( \
-    id                SERIAL              PRIMARY KEY, \
-    hash              TEXT                NOT NULL, \
-    role_id           TEXT                NOT NULL, \
-    role_part         TEXT                NOT NULL, \
-    name              TEXT                NOT NULL, \
-    range             TEXT                NOT NULL, \
-    time              TEXT                NOT NULL, \
-    title             TEXT                NOT NULL, \
-    message           TEXT                NOT NULL, \
-    active            BOOL                NOT NULL    DEFAULT  FALSE, \
-    remark            TEXT \
+    survey_id   SERIAL              PRIMARY KEY, \
+    user_id     TEXT                NOT NULL, \
+    user_role   TEXT                NOT NULL, \
+    survey_name TEXT                NOT NULL, \
+    time        TEXT                NOT NULL, \
+    title       TEXT                NOT NULL, \
+    message     TEXT                NOT NULL, \
+    active      BOOL                NOT NULL    DEFAULT  FALSE, \
+    remark      TEXT \
     ); '   
 
 var feedbackStr = 'CREATE TABLE IF NOT EXISTS feedbacks ( \
-    id      TEXT PRIMARY KEY     NOT NULL, \
+    fb_id      TEXT PRIMARY KEY     NOT NULL, \
     survey_id  TEXT                NOT NULL, \
     member_id  TEXT                NOT NULL, \
     ts         timestamp           NOT NULL, \

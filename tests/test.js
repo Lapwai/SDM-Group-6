@@ -1,49 +1,60 @@
-console.log("test begin");
+let chai = require('chai');
+let expect = require("chai").expect;
+const app = require('../app')
+var http = require('http')
+var request = require('supertest');
 
 
-// var survey_controller = require('../controllers/surveycontroller');
-
-const expect = require('chai').expect
-
-describe('#surveycontroller.js', function() {
-  describe('#verifyAuth()', function() {
-    it('should return a researcher role', function() {
-        // return surveylistForResearcherOrManager('UCV7G6BM1')//UCV7G6BM1 is a manager;
-        //     .then(function(res) {
-        //     return res.json();
-        //     }).then(function(json) {
-        //     expect(json).to.be.an('object');
-        //   });  
-    })
-  })
-})
-
-// it('异步请求应该返回一个对象', function() {
-//     return fetch('https://api.github.com')
-//       .then(function(res) {
-//         return res.json();
-//       }).then(function(json) {
-//         expect(json).to.be.an('object');
-//       });
-//   });
-
-// const expect = require('chai').expect;
-// const multiplyNumbers = require('../index.js').multiplyNumbers;
- 
-// describe('Index', function () {
-//     describe('#multiplyNumbers()', function () {
-//         it('should return the result of multiplication', function () {
-//             let result = multiplyNumbers(4, 6);
-//             expect(result).to.equal(24);
-//         });
-//     });
-// });
-
-
-// function multiplyNumbers(x, y) {
-//     return x * y;
-// }
- 
-// module.exports = {
-//     multiplyNumbers : multiplyNumbers
-// }
+describe('#Manager and Researcher list the survey cereated by current people.',function(){
+  describe('#User should list survey list with different auth', function () {
+    request = request('http://localhost:5000');
+    it('#Manager should list all survey that come from current manager', function(done) {
+        request
+        .post('/slashcommand/survey/list')
+        .set("Connection", "keep alive")
+        .set("Content-Type", "application/x-www-form-urlencoded")
+        .type("form")
+        .send({"user_name":"Alex","text":"researcher","user_id":"UCV7G6BM1"})
+        .expect(200)
+        .end(function(err, res) {
+          if (err) done(err);
+          res.body.should.have.property('text');
+          res.body.participant.should.have.property('8', 'test8');
+           });
+        done();
+    });
+    it('#Researcher should list all survey that come from current manager', function(done) {
+      request
+        .post('/slashcommand/survey/list')
+        .set("Connection", "keep alive")
+        .set("Content-Type", "application/x-www-form-urlencoded")
+        .type("form")
+        .send({"user_name":"Alex","text":"researcher","user_id":"UCV7GM6BM"})
+        .expect(200)
+        .end(function(err, res) {
+          if (err) done(err);
+          res.body.should.have.property('text');
+          // res.body.participant.should.have.property('1', 'test123');
+          res.body.participant.should.have.property('1,test123,Active\n2,test123,Active\n3,test3,Active\n4,test3,Not Active\n5,test8,Not Active\n');
+           });
+        done();
+    });
+    it('#No survey manager should receive feedback as no survey created by you.', function(done) {
+      request
+        .post('/slashcommand/survey/list')
+        .set("Connection", "keep alive")
+        .set("Content-Type", "application/x-www-form-urlencoded")
+        .type("form")
+        .send({"user_name":"Alex","text":"researcher","user_id":"UCV7GMBM1"})
+        .expect(200)
+        .end(function(err, res) {
+          if (err) done(err);
+          res.body.should.have.property('text');
+          // res.body.participant.should.have.property('1', 'test123');
+          res.body.participant.should.contain.property('Sorry, no survey');
+           });
+        done();
+    });
+   
+  });
+});

@@ -21,6 +21,7 @@ function add(hash,params,channelID) {
 function post(hash,params,channelID) {
     let attachments = gengerateAttachment(hash,params)
     let bodyParams = {'scope':'chat:write',
+                'response_type':'ephemeral',                
                 'channel': channelID,
                 'text': '',
                 'response_type' : 'in_channel',

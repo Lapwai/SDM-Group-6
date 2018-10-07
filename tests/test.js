@@ -4,17 +4,20 @@ const app = require('../app')
 var http = require('http')
 var request = require('supertest');
 
+const server_url = 'https://sdm-g6.herokuapp.com/'
+
+// "test": "./node_modules/mocha/bin/mocha ./tests/test.js"
 
 describe('#Manager and Researcher list the survey cereated by current people.',function(){
   describe('#User should list survey list with different auth', function () {
-    request = request('http://localhost:5000');
+    request = request(server_url);
     it('#Manager should list all survey that come from current manager', function(done) {
         request
         .post('/slashcommand/survey/list')
         .set("Connection", "keep alive")
         .set("Content-Type", "application/x-www-form-urlencoded")
         .type("form")
-        .send({"user_name":"Alex","text":"researcher","user_id":"UCV7G6BM1"})
+        .send({"user_name":"ioswpf","text":"researcher","user_id":"UCSLXUNRG"})
         .expect(200)
         .end(function(err, res) {
           if (err) done(err);
@@ -58,3 +61,6 @@ describe('#Manager and Researcher list the survey cereated by current people.',f
    
   });
 });
+
+
+module.exports = { server_url }

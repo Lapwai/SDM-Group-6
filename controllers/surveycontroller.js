@@ -166,12 +166,8 @@ exports.view = function(req, res) {
             view.then(viewValue => {
                 if(viewValue.rowCount === 0) {
                     textRes.errorRes(req,res,'There is no feedback of your survey!')
-                } else {
-                    var str = 'To do ...'
-                    viewValue.rows.forEach(e => {
-                        
-                    })
-                    textRes.successRes(res,str)
+                } else {                    
+                    textRes.successRes(res,generateStr(viewValue))
                 }
             }).catch(err => {
                 textRes.errorRes(req,res,err.message||err)
@@ -184,11 +180,11 @@ exports.view = function(req, res) {
 function viewGenerateSql(user_id,param) {
     return new Promise(function(resolve, reject) {
         if(param !== 'all') {
-            resolve('SELECT * FROM feedbacks WHERE survey_id = \'' + param + '\'')
+            resolve('SELECT survey.title,survey.message,feedbacks.option,feedbacks.channel_name,feedbacks.remark,feedbacks.ts FROM survey,feedbacks WHERE feedbacks.survey_id = survey.id AND survey.id = ' + param + ';')
        } else {
            let all = viewGetAllID(user_id)
            all.then(ids => {
-               var str = 'SELECT * FROM feedbacks WHERE survey_id IN ('
+               var str = 'SELECT survey.title,survey.message,feedbacks.option,feedbacks.channel_name,feedbacks.remark,feedbacks.ts FROM survey,feedbacks WHERE feedbacks.survey_id = survey.id AND survey.id IN ('
                ids.forEach( e => {
                    str = str + '\'' + e['id'] + '\','
                });
@@ -214,6 +210,23 @@ function viewGetAllID(user_id) {
             reject(err.message||err)
         })
     })
+}
+function generateStr(value) {
+    let str = '*Survey title | Survey Message | Survey option | Channel name | time *\n'
+    value.rows.forEach(e => {
+        let happiness_level = ''
+        switch(e.option){
+            case '1': happiness_level = 'Very unhappy'; break;
+            case '2': happiness_level = 'Unhappy'; break;
+            case '3': happiness_level = 'Genreal'; break;
+            case '4': happiness_level = 'Happy'; break;
+            default: happiness_level = 'Very Happy'; break;
+        }
+        let time = '' + e.ts
+        str = str.concat(e.title,' | ',e.message,' | ',happiness_level,' | ',e.channel_name,' | ',time.substring(0,13) + '\n')
+        console.log(JSON.stringify(e))
+    })
+    return str + 'asdasd'
 }
    
 

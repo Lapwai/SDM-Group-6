@@ -34,8 +34,8 @@ function generateSql(payload) {
             }
             let survey_id = survey_ids.rows[0]['id']
             let member_id = payload.user.id
-            let channel_id = payload.channel.name
-            let channel_name = payload.channel.id
+            let channel_id = payload.channel.id
+            let channel_name = payload.channel.name
             let ts = '\'now\''
             let option = payload.actions[0].selected_options[0].value
 

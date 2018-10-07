@@ -52,7 +52,6 @@ function addVerifyParams(params) {
     });
     return [true,'']
 }
-
 function addGenerateSql(hash, user_id, part, params) {
     return new Promise(function(resolve, reject) {
 

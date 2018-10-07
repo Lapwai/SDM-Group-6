@@ -75,6 +75,8 @@ exports.add = function(req, res) {
 function addVerifyParams(users) {
     if(users.length < 2 || (users[0] !== 'researcher' && users[0] !== 'manager')) {
         return [false, 'Please input correct command! \n `/admin_add researcher/manager @user1 @user2 ...` ']
+    } else {
+        return [true,'']
     }
 }
 function addRequestMembers() {

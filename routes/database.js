@@ -31,15 +31,15 @@ async function pgQuery(queryStr) {
 
 
 var adminStr = 'CREATE TABLE IF NOT EXISTS admin ( \
-    id         TEXT PRIMARY KEY    NOT NULL, \
-    name       TEXT                NOT NULL \
+    id                TEXT PRIMARY KEY    NOT NULL, \
+    name              TEXT                NOT NULL \
     ); '
 
 var roleStr = 'CREATE TABLE IF NOT EXISTS role ( \
-    id         TEXT PRIMARY KEY    NOT NULL, \
-    name       TEXT                NOT NULL, \
-    real_name  TEXT                NOT NULL, \
-    part       TEXT                NOT NULL \
+    id                TEXT PRIMARY KEY    NOT NULL, \
+    name              TEXT                NOT NULL, \
+    real_name         TEXT                NOT NULL, \
+    part              TEXT                NOT NULL \
     ); '
 
 var surveyStr = 'CREATE TABLE IF NOT EXISTS survey ( \
@@ -57,12 +57,12 @@ var surveyStr = 'CREATE TABLE IF NOT EXISTS survey ( \
     ); '   
 
 var feedbackStr = 'CREATE TABLE IF NOT EXISTS feedbacks ( \
-    id      TEXT PRIMARY KEY     NOT NULL, \
-    survey_id  TEXT                NOT NULL, \
-    member_id  TEXT                NOT NULL, \
-    ts         timestamp           NOT NULL, \
-    option     TEXT                NOT NULL, \
-    remark     TEXT \
+    id                TEXT PRIMARY KEY     NOT NULL, \
+    survey_id         INT4                NOT NULL, \
+    member_id         TEXT                NOT NULL, \
+    ts                timestamp           NOT NULL, \
+    option            TEXT                NOT NULL, \
+    remark            TEXT \
     ); '   
 
 async function createTables() { 

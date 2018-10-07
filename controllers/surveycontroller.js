@@ -53,15 +53,21 @@ function addVerifyParams(params) {
     });
     return [true,'']
 }
-function addGenerateSql(hash,user_id, part, params) {
-    let survey_name = params[0]
-    let survey_range = params[1]
-    let survey_time = params[2]
-    let survey_title = params[3]
-    let survey_message = params[4]
+function addGenerateSql(hash, user_id, part, params) {
+    return new Promise(function(resolve, reject) {
 
-    let str = 'INSERT INTO survey(hash, role_id, role_part, name, range, time, title, message, active) VALUES (\'' + hash + '\',\'' + user_id + '\',\'' + part + '\',\'' + survey_name + '\',\'' +  survey_range + '\',\'' +  survey_time + '\',\'' +  survey_title + '\',\'' +  survey_message + '\',' + 'false' + ');'
-    return str
+        let survey_name = params[0]
+        let survey_range = params[1]
+        let survey_time = params[2]
+        let survey_title = params[3]
+        let survey_message = params[4]
+
+        let str = 'INSERT INTO survey(hash, role_id, role_part, name, range, time, title, message, active) VALUES (\'' + hash + '\',\'' + user_id + '\',\'' + part + '\',\'' + survey_name + '\',\'' +  survey_range + '\',\'' +  survey_time + '\',\'' +  survey_title + '\',\'' +  survey_message + '\',' + 'false' + ');'
+        resolve(str)
+    })
+
+
+    
 }
 
 

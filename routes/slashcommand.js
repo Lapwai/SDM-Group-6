@@ -5,8 +5,6 @@ var router = express.Router();
 var admin_controller = require('../controllers/admincontroller'); 
 var survey_controller = require('../controllers/surveycontroller');
 var my_controller = require('../controllers/mycontroller')
-var schedule_controller = require('../controllers/schedulecontroller')
-var interactivity_controller = require('../controllers/interactivitycontroller')
 
 router.get('/test', (req, res) => {
     res.send("slash command get test response!");
@@ -34,10 +32,6 @@ router.post('/survey/view', survey_controller.view);
 
 //Personal suervey records
 router.post('/my/history', my_controller.history);
-
-
-// interactivity
-router.post('/interactivity', interactivity_controller.interactivity);
 
 
 module.exports = router;

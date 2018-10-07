@@ -43,5 +43,8 @@
     "morgan": "~1.9.0",
     "pg": "^7.4.3",
     "request": "^2.88.0"
+  },
+  "devDependencies": {
+    "supertest": "^3.3.0"
   }
 }

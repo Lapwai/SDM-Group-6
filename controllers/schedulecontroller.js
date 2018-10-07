@@ -88,7 +88,7 @@ function gengerateAttachment(hash,params) {
         "attachment_type" : "default",
         'callback_id': hash,
         "actions" : [{
-            "name" : "happy list",
+            "name" : "happiness",
             "text" : "Pick a happiness level...",
             "type" : "select",
             "options" : [{
@@ -108,24 +108,25 @@ function gengerateAttachment(hash,params) {
                     "value" : "5"
                 }]
             }]
-        },{
-            "fallback" : "You can not user this feature!",
-            "color" : "#DDDDDD",
-            "attachment_type" : "default",
-            'callback_id': hash,
-            "actions" : [{
-                "name" : "reminder",
-                "text" : "Reminder me later",
-                "type" : "button",
-                "style" : "#DDDDDD",
-                "value" : "1",
-                "confirm" : {
-                    "text" : "Are you sure?",
-                    "ok_text" : "Yes",
-                    "dismiss_text" : "No"
-                }
-            }]
         }
+        // ,{
+        //     "fallback" : "You can not user this feature!",
+        //     "color" : "#DDDDDD",
+        //     "attachment_type" : "default",
+        //     'callback_id': hash,
+        //     "actions" : [{
+        //         "name" : "reminder",
+        //         "text" : "Reminder me later",
+        //         "type" : "button",
+        //         "style" : "#DDDDDD",
+        //         "value" : "1",
+        //         "confirm" : {
+        //             "text" : "Are you sure?",
+        //             "ok_text" : "Yes",
+        //             "dismiss_text" : "No"
+        //         }
+        //     }]
+        // }
     ]
     return attachments
 }

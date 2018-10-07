@@ -17,7 +17,11 @@ function successRes(res,text) {
 
 function errorRes(req,res,text) {
     let command = '\n\nYour previous command: \n_'
-    command = command + req.body.command + ' ' + req.body.text +'_' 
+    if(req.body.command){
+        command = command + req.body.command + ' ' + req.body.text +'_' 
+    } else {
+        command = ''
+    }
     var responseObject = {
         'attachments': [{
             'fallback': 'Required plain-text summary of the attachment.',

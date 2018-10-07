@@ -4,7 +4,45 @@ const request = require('request')
 const textRes = require('./textresponse')
 
 exports.interactivity = function(req, res) {
-    res.send(JSON.stringify(req.body));
+    let type = req.body.payload.actions[0].type
+    if(type === 'select') {
+        generateSql(req.body).then(sqlStr => {
+            console.log(sqlStr)
+            db.pgQuery(sqlStr).then(_ => {
+                textRes.successRes(res,'Thank you for your cooperation!')
+            }).catch(err => {
+                textRes.errorRes(req,res,err.message||err)
+            }) 
+        }).catch(err => {
+            textRes.errorRes(req,res,err.message||err)
+        }) 
+    } else {
+        textRes.successRes(res,'Got it. \nThe survey will remind you ten minutes later!')
+    }
+}
+
+function generateSql(body) {
+    return new Promise((resolve, reject) => {
+        let callback_id = body.payload.callback_id
+        db.pgQuery('SELECT * FROM survey WHERE hash = \'' + callback_id + '\';')
+        .then(survey_ids => {
+            if(survey_ids.rowCount === 0) {
+                reject('Did not find the survey!')
+            }
+            let survey_id = survey_ids.rows[0]['id']
+            let member_id = body.payload.user.id
+            let channel_id = body.payload.channel.name
+            let channel_name = body.payload.channel.id
+            let ts = '\'now\''
+            let option = body.payload.actions[0].selected_options[0].value
+
+            let str = 'INSERT INTO feedbacks(survey_id,member_id,channel_id,channel_name,ts,option) VALUES (';
+            str = str.concat(survey_id,',',member_id,',',channel_id,',',channel_name,',',ts,',',option,');')
+            resolve(str)
+        }).catch(err => {
+            reject(err.message||err)
+        })
+    })
 }
 
 

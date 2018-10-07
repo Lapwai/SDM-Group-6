@@ -18,7 +18,7 @@ exports.add = function(req, res) {
         }
         let hash = crypto.createHash('md5').update(new Date().toString()).digest('hex')
         addQueryChannelID(params[1]).then(channelID => {
-            let sqlStr = addGenerateSql(hash,req.body.user_id,value,params)
+            let sqlStr = addGenerateSql(hash,req.body.user_id,value,params,channelID)
             let insert = db.pgQuery(sqlStr)
             insert.then(value => {
                 if(value == 'researcher') {
@@ -56,13 +56,12 @@ function addVerifyParams(params) {
     });
     return [true,'']
 }
-function addGenerateSql(hash, user_id, part, params) {
+function addGenerateSql(hash, user_id, part, params,channelID) {
     let survey_name = params[0]
-    let survey_range = params[1]
     let survey_time = params[2]
     let survey_title = params[3]
     let survey_message = params[4]
-    let str = 'INSERT INTO survey(hash, role_id, role_part, name, range, time, title, message, active) VALUES (\'' + hash + '\',\'' + user_id + '\',\'' + part + '\',\'' + survey_name + '\',\'' +  survey_range + '\',\'' +  survey_time + '\',\'' +  survey_title + '\',\'' +  survey_message + '\',' + 'false' + ');'
+    let str = 'INSERT INTO survey(hash, role_id, role_part, name, channel_id, time, title, message, active) VALUES (\'' + hash + '\',\'' + user_id + '\',\'' + part + '\',\'' + survey_name + '\',\'' +  channelID + '\',\'' +  survey_time + '\',\'' +  survey_title + '\',\'' +  survey_message + '\',' + 'false' + ');'
     return str
 }
 function addQueryChannelID(name) {

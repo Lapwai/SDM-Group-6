@@ -48,7 +48,7 @@ var surveyStr = 'CREATE TABLE IF NOT EXISTS survey ( \
     role_id           TEXT                NOT NULL, \
     role_part         TEXT                NOT NULL, \
     name              TEXT                NOT NULL, \
-    range             TEXT                NOT NULL, \
+    channel_id        TEXT                NOT NULL, \
     time              TEXT                NOT NULL, \
     title             TEXT                NOT NULL, \
     message           TEXT                NOT NULL, \
@@ -57,9 +57,11 @@ var surveyStr = 'CREATE TABLE IF NOT EXISTS survey ( \
     ); '   
 
 var feedbackStr = 'CREATE TABLE IF NOT EXISTS feedbacks ( \
-    id                TEXT PRIMARY KEY    NOT NULL, \
+    id                SERIAL              PRIMARY KEY, \
     survey_id         INT4                NOT NULL, \
     member_id         TEXT                NOT NULL, \
+    channel_id        TEXT                NOT NULL, \
+    channel_name      TEXT                NOT NULL, \
     ts                timestamp           NOT NULL, \
     option            TEXT                NOT NULL, \
     remark            TEXT \

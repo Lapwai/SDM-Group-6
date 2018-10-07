@@ -226,7 +226,7 @@ function generateStr(value) {
         str = str.concat(e.title,' | ',e.message,' | ',happiness_level,' | ',e.channel_name,' | ',time.substring(0,13) + '\n')
         console.log(JSON.stringify(e))
     })
-    return str + 'asdasd'
+    return str
 }
    
 

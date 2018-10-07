@@ -7,22 +7,22 @@ const textRes = require('./textresponse')
 
 exports.history = function(req, res) {
     processSurveyById(req.body.user_id).then(value =>{
-        textRes.textRes(res,false,value)
+        textRes.successRes(res,value)
     }).catch(err => {
-        textRes.textRes(res,true,err)
+        textRes.errorRes(req,res,err)
     })
 
 }
 function processSurveyById(id) {
     var output=''
     return new Promise(function(resolve, reject) {
-        var results = db.pgQuery('SELECT * FROM feedbacks WHERE member_id = \''+ id +'\';')
+        var results = db.pgQuery('select feedbacks.option,survey.title,survey.message from feedbacks,survey  where feedbacks.survey_id = survey.id and feedbacks.member_id = \''+ id +'\';')
         results.then( value => {
             if(value.rowCount === 0) {
                 reject('Sorry, no survey created by you!')
             } else {
                 for(var i=0;i<value.rowCount;i++){
-                    output =output+[value.rows[i]['survey_id'],value.rows[i]['fb_id']]+'\n'
+                    output =output+[value.rows[i]['title'],value.rows[i]['message'],value.rows[i]['option']]+'\n'
                 } 
                 resolve(output)
             }

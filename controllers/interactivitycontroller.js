@@ -5,11 +5,8 @@ const textRes = require('./textresponse')
 
 exports.interactivity = function(req, res) {
     let payload = JSON.parse(req.body.payload)
-    console.log(payload)
     let type = payload.actions[0].type
-    console.log('enter+' + type +  '+type')
     if(type === 'select') {
-        console.log('select')
         generateSql(payload).then(sqlStr => {
             console.log(sqlStr)
             db.pgQuery(sqlStr).then(_ => {
@@ -20,7 +17,6 @@ exports.interactivity = function(req, res) {
                 textRes.errorRes(req,res,err.message||err)
             }) 
         }).catch(err => {
-            console.log('select err')
             textRes.errorRes(req,res,err.message||err)
         }) 
     } else {
@@ -44,7 +40,7 @@ function generateSql(payload) {
             let option = payload.actions[0].selected_options[0].value
 
             let str = 'INSERT INTO feedbacks(survey_id,member_id,channel_id,channel_name,ts,option) VALUES (';
-            str = str.concat(survey_id,',',member_id,',',channel_id,',',channel_name,',',ts,',',option,');')
+            str = str.concat(survey_id,',\'',member_id,'\',\'',channel_id,'\',\'',channel_name,',',ts,',\'',option,'\');')
             resolve(str)
         }).catch(err => {
             reject(err.message||err)

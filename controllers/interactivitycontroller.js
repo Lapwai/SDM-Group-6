@@ -40,7 +40,7 @@ function generateSql(payload) {
             let option = payload.actions[0].selected_options[0].value
 
             let str = 'INSERT INTO feedbacks(survey_id,member_id,channel_id,channel_name,ts,option) VALUES (';
-            str = str.concat(survey_id,',\'',member_id,'\',\'',channel_id,'\',\'',channel_name,',',ts,',\'',option,'\');')
+            str = str.concat(survey_id,',\'',member_id,'\',\'',channel_id,'\',\'',channel_name,'\',',ts,',\'',option,'\');')
             resolve(str)
         }).catch(err => {
             reject(err.message||err)

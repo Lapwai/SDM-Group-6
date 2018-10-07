@@ -6,14 +6,18 @@ const textRes = require('./textresponse')
 exports.interactivity = function(req, res) {
     let type = req.body.payload.actions[0].type
     if(type === 'select') {
+        console.log('select')
         generateSql(req.body).then(sqlStr => {
             console.log(sqlStr)
             db.pgQuery(sqlStr).then(_ => {
+                console.log('pg query success')
                 textRes.successRes(res,'Thank you for your cooperation!')
             }).catch(err => {
+                console.log('pg query failure')
                 textRes.errorRes(req,res,err.message||err)
             }) 
         }).catch(err => {
+            console.log('select err')
             textRes.errorRes(req,res,err.message||err)
         }) 
     } else {

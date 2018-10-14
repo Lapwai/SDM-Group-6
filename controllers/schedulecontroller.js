@@ -3,19 +3,32 @@ const db = require('../routes/database')
 const request = require('request')
 const schedule = require('node-schedule')
 
-function addDefault(param) {
-
-    let insertSql = 'INSERT INTO survey(title, starttime, option, timeinterval, postpone) VALUES (\'' + title + '\', \'' + starttime + '\', \'' + option + '\', \'' +  + interval + '\', \'' +  + postpone + '\');';
-    db.pgQuery(insertSql).then(_ => {
-        console.log('survey set default success!')
-    }).catch(err => {
-        console.log(err)
+function insertSurvey(title, starttime, option, interval, postpone) {
+    return new Promise((resolve, reject) => {
+        let insertSql = 'INSERT INTO survey(title, starttime, option, timeinterval, postpone) VALUES (\'' + title + '\', \'' + starttime + '\', \'' + option + '\', \'' +  + interval + '\', \'' +  + postpone + '\');';
+        db.pgQuery(insertSql).then(_ => {
+            resolve('')
+            console.log('insert new survey success!')
+        }).catch(err => {
+            reject(err.message || err)
+        })
     })
 }
 
-function update() {
-    addDefault()
+function updateSurvey(submission) {
+    let title = submission.title
+    let starttime = submission.starttime
+    let option = submission.option
+    let timeinterval = submission.timeinterval
+    let postpone = submission.postpone
 
+    insertSurvey(title,starttime,option,timeinterval,postpone)
+    .then(_ => {
+        console.log('insert survey success')
+    }).catch(err => {
+        console.log('insert survey err')
+        console.log(err)
+    }) 
 }
 
 
@@ -111,4 +124,4 @@ function runloop() {
 
 
 
-module.exports = {addDefault, update, post, runloop}
+module.exports = {updateSurvey}

@@ -2,6 +2,7 @@ const app = require('../app')
 const db = require('../routes/database')
 const request = require('request')
 const textRes = require('./textresponse')
+const shchedule = require('./schedulecontroller')
 
 exports.interactivity = function(req, res) {
     let payload = JSON.parse(req.body.payload)
@@ -10,8 +11,8 @@ exports.interactivity = function(req, res) {
         interButton(payload)
         textRes.successRes(res, 'Got the message!')
     } else if(payload.type === 'dialog_submission') {
-        interDialog(payload)
-        textRes.successRes(res, 'Got the dialog!')
+        interDialog(res,payload)
+        // textRes.successRes(res, 'Got the dialog!')
     } else {
         textRes.errorRes(req,res, req.body.payload)
     }
@@ -23,20 +24,31 @@ function interButton(payload) {
         return
     }
     if(name === 'conf') {
-        postConfDialog(payload.trigger_id)
-        console.log('post conf')
+        postDialog(generateOptions(payload.trigger_id,confAtt()))
     } else if(name === 'event' ) {
-        postEventDialog(payload.trigger_id)
-        console.log('post event')
+        postDialog(generateOptions(payload.trigger_id,eventAtt()))
     }
 }
 
+function postDialog(options) {
+    request(options, (err, _, body) => {
+        let result = {}
+        if((typeof body) === 'string') {
+            result = JSON.parse(body)
+        } else {
+            result = body
+        }
+        if(err || result['error']) {
+            console.log( err || result['error'])
+        } else {
+            console.log('success')
+        }
+    })
+}
 
-function postConfDialog(trigger_id) {
-    let bodyPara = {
-                // 'response_type' : 'in_channel',
-                'trigger_id':trigger_id,
-                'dialog':confAtt()}
+function generateOptions(trigger_id,att) {
+    let bodyPara = {'trigger_id':trigger_id,
+                'dialog':att}
     let options = {
         url: 'https://slack.com/api/dialog.open',
         method:'POST',
@@ -47,27 +59,12 @@ function postConfDialog(trigger_id) {
         },
         body: JSON.stringify(bodyPara)
     };
-    console.log('conf' + JSON.stringify(options))
-    request(options, (err, _, body) => {
-        let result = {}
-        if((typeof body) === 'string') {
-            result = JSON.parse(body)
-        } else {
-            result = body
-        }
-        if(err || result['error']) {
-            console.log('post dialog error')
-            console.log(err)
-            console.log(result)
-            console.log( err || result['error'])
-        } else {
-            console.log('success')
-        }
-    })
+    return options
 }
+
 function confAtt() {
     let attachments ={
-        'callback_id': 'conf-dialog',
+        'callback_id': 'conf',
         'title': 'Configuration',
         'state': 'conf',
         'elements': [
@@ -91,8 +88,8 @@ function confAtt() {
                     'value': '11'
                   },
                   {
-                    'label': '13',
-                    'value': '13:00'
+                    'label': '13:00',
+                    'value': '13'
                   },
                   {
                     'label': '15:00',
@@ -152,20 +149,47 @@ function confAtt() {
     }
     return attachments
 }
-
-function postEventDialog(trigger_id) {
-
+function eventAtt() {
+    let attachments ={
+        'callback_id': 'event',
+        'title': 'Event log',
+        'state': 'event',
+        'elements': [
+            {
+                'label': 'Meeting Theme',
+                'name': 'name',
+                'type': 'text',
+                'placeholder': 'Please input the meeting theme'
+            },
+            {
+                'label': 'Meeting date',
+                'name': 'name',
+                'type': 'text',
+                'placeholder': 'Please input the meeting date such as \"12 Aug 2018\"'
+            },
+            {
+                'label': 'Meeting time',
+                'name': 'name',
+                'type': 'text',
+                'placeholder': 'Please input the meeting time such as \"14:20\"'
+            }
+        ]
+    }
+    return attachments
 }
 
 
-
-
-
-function interDialog(payload) {
-    console.log(payload)
-    console.log(JSON.stringify(payload))
+function interDialog(res,payload) {
+    if(payload.state === 'conf') {
+        shchedule.updateSurvey(payload.submission)
+        res.status(200);
+        res.send('conf insert');
+    } else if (payload.state === 'event') {
+        res.status(200);
+        res.send('event insert');
+    }
 }
-
+// {"type":"dialog_submission","token":"NoLDQeFvLs2uJmXkbrc1jlEv","action_ts":"1539539639.051180","team":{"id":"TCSEYGNKW","domain":"sdm-6"},"user":{"id":"UCSLXUNRG","name":"ioswpf"},"channel":{"id":"DCS415NQH","name":"directmessage"},"submission":{"title":"Test title","starttime":"13:00","option":"Very happy; happy; normal; unhappy; hha","timeinterval":"3","postpone":"5"},"callback_id":"conf-dialog","response_url":"https://hooks.slack.com/app/TCSEYGNKW/457285614646/qCeaAQRFq7XK9Nri05A9fMhK","state":"conf"}
 
 
 

@@ -3,25 +3,26 @@ const db = require('../routes/database')
 const request = require('request')
 const schedule = require('node-schedule')
 
-// add schedule for researcher
-function add(hash,params,channelID) {
-    let survey_name = params[0]
-    let survey_range = params[1]
-    let survey_time = params[2].split(':')
-    let survey_title = params[3]
-    let survey_message = params[4]
+function addDefault(param) {
 
-    // schedule.scheduleJob({hour: survey_time[0], minute: survey_time[1], dayOfWeek: 1-5}, function(){
-    schedule.scheduleJob({second: 30}, function(){
-        console.log('scheduleCronstyle:' + new Date());
+    let insertSql = 'INSERT INTO survey(title, starttime, option, timeinterval, postpone) VALUES (\'' + title + '\', \'' + starttime + '\', \'' + option + '\', \'' +  + interval + '\', \'' +  + postpone + '\');';
+    db.pgQuery(insertSql).then(_ => {
+        console.log('survey set default success!')
+    }).catch(err => {
+        console.log(err)
     })
 }
+
+function update() {
+    addDefault()
+
+}
+
 
 // post survey
 function post(hash,params,channelID) {
     let attachments = gengerateAttachment(hash,params)
     let bodyParams = {'scope':'chat:write',
-                'response_type':'ephemeral',                
                 'channel': channelID,
                 'text': '',
                 'response_type' : 'in_channel',
@@ -46,6 +47,7 @@ function post(hash,params,channelID) {
     }
     request(options, callBack)
 }
+
 function queryChannelID(name) {
     return new Promise(function(resolve, reject) {
         let options = {
@@ -77,57 +79,24 @@ function queryChannelID(name) {
     })
 }
 
-function gengerateAttachment(hash,params) {
-    let survey_title = params[3]
-    let survey_message = params[4]
+
+
+function gengerateAttachment(title,option) {
+
     let attachments = [{
         "fallback" : "You can not user this feature!",
         "mrkdwn_in" : ["pretext","text"],
         "pretext" : ":mag: *Survey*",
-        'text': '*' + survey_title + '* \n' + survey_message,
+        'text': title,
         "color" : "#3AA3E3",
         "attachment_type" : "default",
         'callback_id': hash,
         "actions" : [{
             "name" : "happiness",
             "text" : "Pick a happiness level...",
-            "type" : "select",
-            "options" : [{
-                    "text" : "Very unhappy",
-                    "value" : "1"
-                },{
-                    "text" : "Unhappy",
-                    "value" : "2"
-                },{
-                    "text" : "General",
-                    "value" : "3"
-                },{
-                    "text" : "Happy",
-                    "value" : "4"
-                },{
-                    "text" : "Very happy",
-                    "value" : "5"
-                }]
+            "type" : "select"
             }]
         }
-        // ,{
-        //     "fallback" : "You can not user this feature!",
-        //     "color" : "#DDDDDD",
-        //     "attachment_type" : "default",
-        //     'callback_id': hash,
-        //     "actions" : [{
-        //         "name" : "reminder",
-        //         "text" : "Reminder me later",
-        //         "type" : "button",
-        //         "style" : "#DDDDDD",
-        //         "value" : "1",
-        //         "confirm" : {
-        //             "text" : "Are you sure?",
-        //             "ok_text" : "Yes",
-        //             "dismiss_text" : "No"
-        //         }
-        //     }]
-        // }
     ]
     return attachments
 }
@@ -142,4 +111,4 @@ function runloop() {
 
 
 
-module.exports = {add, post, runloop}
+module.exports = {addDefault, update, post, runloop}

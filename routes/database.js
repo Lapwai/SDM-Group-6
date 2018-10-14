@@ -28,55 +28,56 @@ async function pgQuery(queryStr) {
     })
 }
 
-
-
 var adminStr = 'CREATE TABLE IF NOT EXISTS admin ( \
     id                TEXT PRIMARY KEY    NOT NULL, \
     name              TEXT                NOT NULL \
     ); '
 
-var roleStr = 'CREATE TABLE IF NOT EXISTS role ( \
-    id                TEXT PRIMARY KEY    NOT NULL, \
-    name              TEXT                NOT NULL, \
-    real_name         TEXT                NOT NULL, \
-    part              TEXT                NOT NULL \
-    ); '
+// var roleStr = 'CREATE TABLE IF NOT EXISTS role ( \
+//     id                TEXT PRIMARY KEY    NOT NULL, \
+//     name              TEXT                NOT NULL, \
+//     real_name         TEXT                NOT NULL, \
+//     part              TEXT                NOT NULL \
+//     ); '
 
 var surveyStr = 'CREATE TABLE IF NOT EXISTS survey ( \
     id                SERIAL              PRIMARY KEY, \
-    hash              TEXT                NOT NULL, \
-    role_id           TEXT                NOT NULL, \
-    role_part         TEXT                NOT NULL, \
-    name              TEXT                NOT NULL, \
-    channel_id        TEXT                NOT NULL, \
-    time              TEXT                NOT NULL, \
     title             TEXT                NOT NULL, \
-    message           TEXT                NOT NULL, \
-    active            BOOL                NOT NULL    DEFAULT  FALSE, \
-    remark            TEXT \
-    ); '   
-
-var feedbackStr = 'CREATE TABLE IF NOT EXISTS feedbacks ( \
-    id                SERIAL              PRIMARY KEY, \
-    survey_id         INT4                NOT NULL, \
-    member_id         TEXT                NOT NULL, \
-    channel_id        TEXT                NOT NULL, \
-    channel_name      TEXT                NOT NULL, \
-    ts                timestamp           NOT NULL, \
+    starttime         TIME                NOT NULL, \
     option            TEXT                NOT NULL, \
-    remark            TEXT \
+    timeinterval      INTERVAL            NOT NULL, \
+    postpone          INTERVAL            NOT NULL \
     ); '   
 
-async function createTables() { 
-    client = await pool.connect();
+var feedbacksStr = 'CREATE TABLE IF NOT EXISTS feedbacks ( \
+    id                SERIAL              PRIMARY KEY, \
+    member_id         TEXT                NOT NULL, \
+    member_name       TEXT                NOT NULL, \
+    ts                TIMESTAMP           NOT NULL, \
+    option            TEXT                NOT NULL, \
+    commentc          TEXT \
+    ); '   
 
-    var strArr = [adminStr, roleStr, surveyStr, feedbackStr]
-    
-    strArr.forEach(async function(v,i,_) {
-       var results = await client.query(v)
-    })
+function addDefault() {
+    let title = 'Just remind it is your time to submit your happiness information. Choose a button to click.'
+    let starttime = '15:00'
+    let option = 'Very happy|Happy|Normal|Unhappy|Very unhappy'
+    let interval = '2 minutes'
+    let postpone = '5 minutes'
+
+    let insertStr = 'INSERT INTO survey(title, starttime, option, timeinterval, postpone) VALUES (\'' + title + '\', \'' + starttime + '\', \'' + option + '\', \'' + interval + '\', \'' +  postpone + '\');';
+    return insertStr
 }
 
+async function createTables() { 
+
+    pgQuery(adminStr)
+    pgQuery(surveyStr).then(_ => {
+        pgQuery(addDefault())
+    })
+    pgQuery(feedbacksStr)
+
+}
 
 module.exports = {pgQuery, createTables};
 

@@ -6,15 +6,17 @@ var logger = require('morgan');
 var bodyParser = require('body-parser');
 
 
+
 var index = require('./routes/index');
 var slashcommand = require('./routes/slashcommand');
+var externalapi = require('./routes/externalapi');
 var db = require('./routes/database')
-var helmet = require('helmet');
+
 
 
 var app = express();
 
-
+var helmet = require('helmet');
 app.use(helmet());
 
 // view engine setup
@@ -35,10 +37,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 // Important parts
+db.createTables();
 app.use('/', index);
 app.use('/slashcommand', slashcommand)
-db.createTables();
-
+app.use('/api', externalapi)
 
 
 // catch 404 and forward to error handler

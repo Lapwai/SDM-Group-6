@@ -11,7 +11,6 @@ exports.history = function(req, res) {
     }).catch(err => {
         textRes.errorRes(req,res,err)
     })
-
 }
 function processSurveyById(id) {
     var output=''

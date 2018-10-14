@@ -6,47 +6,57 @@ const textRes = require('./textresponse')
 exports.interactivity = function(req, res) {
     let payload = JSON.parse(req.body.payload)
     let type = payload.actions[0].type
-    if(type === 'select') {
-        generateSql(payload).then(sqlStr => {
-            console.log(sqlStr)
-            db.pgQuery(sqlStr).then(_ => {
-                console.log('pg query success')
-                textRes.successRes(res,'Thank you for your cooperation!')
-            }).catch(err => {
-                console.log('pg query failure')
-                textRes.errorRes(req,res,err.message||err)
-            }) 
-        }).catch(err => {
-            textRes.errorRes(req,res,err.message||err)
-        }) 
-    } else {
-        textRes.successRes(res,'Got it. \nThe survey will remind you ten minutes later!')
-    }
+    // if(type === 'select') {
+    //     generateSql(payload).then(sqlStr => {
+    //         db.pgQuery(sqlStr).then(_ => {
+    //             textRes.successRes(res,'Thank you for your cooperation!')
+    //         }).catch(err => {
+    //             textRes.errorRes(req,res,err.message||err)
+    //         }) 
+    //     }).catch(err => {
+    //         textRes.errorRes(req,res,err.message||err)
+    //     }) 
+    // } else {
+    //     textRes.successRes(res,'Got it. \nThe survey will remind you ten minutes later!')
+    // }
+
+    
+
+    textRes.successRes(res, 'got it');
 }
 
-function generateSql(payload) {
-    return new Promise((resolve, reject) => {
-        let callback_id = payload.callback_id
-        db.pgQuery('SELECT * FROM survey WHERE hash = \'' + callback_id + '\';')
-        .then(survey_ids => {
-            if(survey_ids.rowCount === 0) {
-                reject('Did not find the survey!')
-            }
-            let survey_id = survey_ids.rows[0]['id']
-            let member_id = payload.user.id
-            let channel_id = payload.channel.id
-            let channel_name = payload.channel.name
-            let ts = '\'now\''
-            let option = payload.actions[0].selected_options[0].value
 
-            let str = 'INSERT INTO feedbacks(survey_id,member_id,channel_id,channel_name,ts,option) VALUES (';
-            str = str.concat(survey_id,',\'',member_id,'\',\'',channel_id,'\',\'',channel_name,'\',',ts,',\'',option,'\');')
-            resolve(str)
-        }).catch(err => {
-            reject(err.message||err)
-        })
-    })
-}
+
+
+
+
+
+
+
+
+// function generateSql(payload) {
+//     return new Promise((resolve, reject) => {
+//         let callback_id = payload.callback_id
+//         db.pgQuery('SELECT * FROM survey WHERE hash = \'' + callback_id + '\';')
+//         .then(survey_ids => {
+//             if(survey_ids.rowCount === 0) {
+//                 reject('Did not find the survey!')
+//             }
+//             let survey_id = survey_ids.rows[0]['id']
+//             let member_id = payload.user.id
+//             let channel_id = payload.channel.id
+//             let channel_name = payload.channel.name
+//             let ts = '\'now\''
+//             let option = payload.actions[0].selected_options[0].value
+
+//             let str = 'INSERT INTO feedbacks(survey_id,member_id,channel_id,channel_name,ts,option) VALUES (';
+//             str = str.concat(survey_id,',\'',member_id,'\',\'',channel_id,'\',\'',channel_name,'\',',ts,',\'',option,'\');')
+//             resolve(str)
+//         }).catch(err => {
+//             reject(err.message||err)
+//         })
+//     })
+// }
 
 
 

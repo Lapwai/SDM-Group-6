@@ -4,15 +4,9 @@ const request = require('request')
 const textRes = require('./textresponse')
 
 exports.interactivity = function(req, res) {
-    console.log(0)
-    console.log(JSON.parse(req.body.payload))
-    console.log(1)
+
     let payload = JSON.parse(req.body.payload)
-    console.log(typeof payload)
-    console.log(payload.type)
-    console.log('type')
-    console.log(payload['type'])
-    console.log(2)
+
     if(payload.type === 'interactive_message') {
         interButton(payload)
         console.log('message')
@@ -22,12 +16,10 @@ exports.interactivity = function(req, res) {
         console.log('dialog')
         textRes.successRes(res, 'Got the dialog!')
     } else {
-        console.log(payload.type)
         textRes.errorRes(req,res, req.body.payload)
     }
-    console.log(3)
 }
-function interButton() {
+function interButton(payload) {
     let name = payload.actions[0].name
     let value = payload.actions[0].value
     console.log(name)
@@ -43,7 +35,6 @@ function interButton() {
         console.log('post event')
     }
 }
-
 
 
 function postConfDialog(trigger_id) {
@@ -188,7 +179,7 @@ function confAtt() {
     return attachments
 }
 
-function postEventDialog() {
+function postEventDialog(trigger_id) {
 
 }
 

@@ -4,29 +4,33 @@ const request = require('request')
 const textRes = require('./textresponse')
 
 exports.interactivity = function(req, res) {
-    console.log(req.body)
-    console.log(JSON.stringify(req.body))
-    console.log(typeof req.body.payload)
-    console.log(req.body.payload)
     console.log(JSON.parse(req.body.payload))
 
     let payload = JSON.parse(req.body.payload)
     if(payload.type === 'interactive_message') {
         interButton(payload)
+        console.log('message')
+        textRes.successRes(res, 'Got the message!')
     } else if(payload.type !== 'dialog_submission') {
         interDialog(payload)
+        console.log('dialog')
+        textRes.successRes(res, 'Got the dialog!')
     }
 }
 function interButton() {
     let name = payload.actions[0].name
     let value = payload.actions[0].value
-    if(value !== 'no') {
+    console.log(name)
+    console.log(value)
+    if(value === 'no') {
         return
     }
     if(name === 'conf') {
         postConfDialog(payload.trigger_id)
+        console.log('post conf')
     } else if(name === 'event' ) {
         postEventDialog(payload.trigger_id)
+        console.log('post event')
     }
 }
 
@@ -47,6 +51,7 @@ function postConfDialog(trigger_id) {
         },
         body: JSON.stringify(bodyPara)
     };
+    console.log('conf' + options)
     request(options, (err, _, body) => {
         let result = {}
         if((typeof body) === 'string') {
@@ -55,8 +60,7 @@ function postConfDialog(trigger_id) {
             result = body
         }
         if(err || result['error']) {
-            textRes.textRes(res,true,(err || result['error']))
-            reject(err || result['error'])
+            console.log("postdialog err")
         } else {
             console.log('success')
         }

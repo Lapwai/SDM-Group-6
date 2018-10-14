@@ -11,10 +11,13 @@ exports.interactivity = function(req, res) {
         interButton(payload)
         console.log('message')
         textRes.successRes(res, 'Got the message!')
-    } else if(payload.type !== 'dialog_submission') {
+    } else if(payload.type === 'dialog_submission') {
         interDialog(payload)
         console.log('dialog')
         textRes.successRes(res, 'Got the dialog!')
+    } else {
+        console.log(payload.type)
+        textRes.errorRes(req,res, req.body.payload)
     }
 }
 function interButton() {

@@ -11,6 +11,10 @@ const botkit = require('botkit')
 // exports.init = function(req, res) {
 
 exports.init = function(bot, message) {
+    let isInit = false
+    if('init' === message.text || 'Init' === message.text) { isInit = true }
+    if(isInit == false ) { return }
+
     let results = db.pgQuery('SELECT * FROM admin;')
     results.then(queryValue => {
         if(queryValue.rowCount == 0) {
@@ -32,7 +36,20 @@ exports.init = function(bot, message) {
     });
 }
 
-function ConfAtt() {
+exports.configuration = function(bot, message) {
+    let texts = ['conf','Conf','configuration','Configuration']
+    let isConf = false
+    texts.forEach(e => {
+        if(e === message.text) { isConf = true }
+    });
+    if(isConf == false ) { return }
+    verifyAdmin(message.user).then(_ => {
+        postEphemeral(confAtt(),message.channel, message.user)
+    }).catch(err => {
+        bot.reply(message, err.message||err)
+    })
+}
+function confAtt() {
     let attachments = [{
         'fallback' : 'You can not user this feature!',
         'mrkdwn_in' : ['pretext','text'],
@@ -40,35 +57,35 @@ function ConfAtt() {
         'text': 'Do you want to setup the configuration of notification?',
         'color' : '#3AA3E3',
         'attachment_type' : 'default',
-        'callback_id': 'event log',
+        'callback_id': 'conf',
         'actions': [{
             'name': 'conf',
             'text': 'Yes',
             'type': 'button',
-            'value': 'recorder'
+            'value': 'yes'
         },{
             'name': 'conf',
             'text': 'No',
             'type': 'button',
-            'value': 'cancel'
+            'value': 'no'
         }]
     }]
-    let full = {'text': '',
-            'response_type' : 'in_channel',
-            'attachments': attachments}
-
-    return JSON.stringify(full)
+    return attachments
 }
 
-exports.configuration = function(bot, message) {
+exports.eventlog = function(bot, message) {
+    let texts = ['event','Event','eventlog','Eventlog']
+    let isEvent = false
+    texts.forEach(e => {
+        if(e === message.text) { isEvent = true }
+    });
+    if(isEvent == false ) { return }
     verifyAdmin(message.user).then(_ => {
-        bot.reply(message, ConfAtt) 
+        postEphemeral(eventAtt(),message.channel, message.user)
     }).catch(err => {
         bot.reply(message, err.message||err)
     })
 }
-
-
 function eventAtt() {
     let attachments = [{
         'fallback' : 'You can not user this feature!',
@@ -77,54 +94,58 @@ function eventAtt() {
         'text': 'Do you want to record an event?',
         'color' : '#3AA3E3',
         'attachment_type' : 'default',
-        'callback_id': 'event',
+        'callback_id': 'adfafdadfafdadfasdf',
         'actions': [{
             'name': 'event',
             'text': 'Yes',
             'type': 'button',
-            'value': 'recorder'
+            'value': 'yes'
         },{
             'name': 'event',
             'text': 'No',
             'type': 'button',
-            'value': 'cancel'
+            'value': 'no'
         }]
     }]
-    let full = {'text': '',
-            'response_type' : 'in_channel',
-            'attachments': attachments}
-
-    return JSON.stringify(full)
+    return attachments
 }
 
-exports.eventlog = function(bot, message) {
-    verifyAdmin(message.user).then(_ => {
-        bot.reply(message, eventAtt) 
-    }).catch(err => {
-        bot.reply(message, err.message||err)
+function postEphemeral(atts,channel, user) {
+    let bodyPara = {'scope':'bot',
+                'channel':channel,
+                'user':user,
+                'response_type' : 'in_channel',
+                'text':'',
+                'attachments':atts}
+    let options = {
+        url: 'https://slack.com/api/chat.postEphemeral',
+        method:'POST',
+        headers: {
+            'User-Agent': 'SDM Test',
+            'content-type': 'application/json; charset=utf-8',
+            'Authorization' : 'Bearer xoxb-434508566676-433992928064-cHxo9Ahshc7WvBOQ7m3yn3Fc'
+        },
+        body: JSON.stringify(bodyPara)
+    };
+    request(options, (err, _, body) => {
+        let result = {}
+        if((typeof body) === 'string') {
+            result = JSON.parse(body)
+        } else {
+            result = body
+        }
+        if(err || result['error']) {
+            textRes.textRes(res,true,(err || result['error']))
+            reject(err || result['error'])
+        } else {
+            console.log('success')
+        }
     })
 }
 
 /*
-{ type: 'direct_message',
-user: 'UCSLXUNRG',
-text: 'eventlog',
-client_msg_id: '1fa1b599-3dd3-41d1-9a55-22bd65f44921',
-team: 'TCSEYGNKW',
-channel: 'DCS415NQH',
-event_ts: '1539505098.000100',
-ts: '1539505098.000100',
-raw_message:
-{ type: 'message',
-user: 'UCSLXUNRG',
-text: 'eventlog',
-client_msg_id: '1fa1b599-3dd3-41d1-9a55-22bd65f44921',
-team: 'TCSEYGNKW',
-channel: 'DCS415NQH',
-event_ts: '1539505098.000100',
-ts: '1539505098.000100' },
-_pipeline: { stage: 'receive' },
-match: [ 'event', index: 0, input: 'eventlog' ] }
+{"type":"direct_message","user":"UCSLXUNRG","text":"event ahah","client_msg_id":"db89d447-0aaa-41aa-8d4d-7cea545b24f4","team":"TCSEYGNKW","channel":"DCS415NQH","event_ts":"1539523136.000100","ts":"1539523136.000100","raw_message":{"type":"message","user":"UCSLXUNRG","text":"event ahah","client_msg_id":"db89d447-0aaa-41aa-8d4d-7cea545b24f4","team":"TCSEYGNKW","channel":"DCS415NQH","event_ts":"1539523136.000100","ts":"1539523136.000100"},"_pipeline":{"stage":"receive"},"match":["event"]}
+admincontroller.js:101
 */
 
 

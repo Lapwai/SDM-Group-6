@@ -11,19 +11,19 @@ function startBot() {
             throw new Error(err)
         }
     })
-    controller.hears(['hello', 'hi'], ['direct_message', 'direct_mention', 'mention'],
+    controller.hears(['hello', 'hi'], ['direct_message'],
         function (bot, message) { 
             bot.reply(message, 'Meow. :smile_cat:') 
     })
 
     controller.hears(['init','Init'], 
-    ['direct_message', 'direct_mention', 'mention'], admin.init)
+    ['direct_message'], admin.init)
 
     controller.hears(['conf','Conf','configuration','Configuration'], 
-    ['direct_message', 'direct_mention', 'mention'], admin.configuration)
+    ['direct_message'], admin.configuration)
 
     controller.hears(['event','Event','eventlog','Eventlog'], 
-    ['direct_message', 'direct_mention', 'mention'], admin.eventlog)
+    ['direct_message'], admin.eventlog)
     
 }
 

@@ -5,28 +5,181 @@ const textRes = require('./textresponse')
 
 exports.interactivity = function(req, res) {
     let payload = JSON.parse(req.body.payload)
-    let type = payload.actions[0].type
-    // if(type === 'select') {
-    //     generateSql(payload).then(sqlStr => {
-    //         db.pgQuery(sqlStr).then(_ => {
-    //             textRes.successRes(res,'Thank you for your cooperation!')
-    //         }).catch(err => {
-    //             textRes.errorRes(req,res,err.message||err)
-    //         }) 
-    //     }).catch(err => {
-    //         textRes.errorRes(req,res,err.message||err)
-    //     }) 
-    // } else {
-    //     textRes.successRes(res,'Got it. \nThe survey will remind you ten minutes later!')
-    // }
+    if(payload.type === 'interactive_message') {
+        interButton(payload)
+    } else if(payload.type !== 'dialog_submission') {
+        interDialog(payload)
+    }
+}
+function interButton() {
+    let name = payload.actions[0].name
+    let value = payload.actions[0].value
+    if(value !== 'no') {
+        return
+    }
+    if(name === 'conf') {
+        postConfDialog(payload.trigger_id)
+    } else if(name === 'event' ) {
+        postEventDialog(payload.trigger_id)
+    }
+}
 
-    console.log(JSON.stringify(req.body))
-    textRes.successRes(res, 'got it');
+
+
+function postConfDialog(trigger_id) {
+    let bodyPara = {
+                // 'response_type' : 'in_channel',
+                'trigger_id':trigger_id,
+                'dialog':confAtt()}
+    let options = {
+        url: 'https://slack.com/api/dialog.open',
+        method:'POST',
+        headers: {
+            'User-Agent': 'SDM Test',
+            'content-type': 'application/json; charset=utf-8',
+            'Authorization' : 'Bearer xoxb-434508566676-433992928064-cHxo9Ahshc7WvBOQ7m3yn3Fc'
+        },
+        body: JSON.stringify(bodyPara)
+    };
+    request(options, (err, _, body) => {
+        let result = {}
+        if((typeof body) === 'string') {
+            result = JSON.parse(body)
+        } else {
+            result = body
+        }
+        if(err || result['error']) {
+            textRes.textRes(res,true,(err || result['error']))
+            reject(err || result['error'])
+        } else {
+            console.log('success')
+        }
+    })
+}
+function confAtt() {
+    let attachments ={
+        "callback_id": "conf-dialog",
+        "title": "Notification configuration",
+        "state": "conf",
+        "elements": [
+            {
+                "label": "Title",
+                "name": "title",
+                "type": "text",
+                "placeholder": "Just remind it is your time to submit your happiness information. Choose a button to click."
+            },
+            {
+                "label": "Start time",
+                "type": "select",
+                "name": "starttime",
+                "options": [
+                  {
+                    "label": "9:00",
+                    "value": "9"
+                  },
+                  {
+                    "label": "11:00",
+                    "value": "11"
+                  },
+                  {
+                    "label": "13",
+                    "value": "13:00"
+                  },
+                  {
+                    "label": "15:00",
+                    "value": "15"
+                  }
+                ]
+            },
+            {
+                "label": "Option 1",
+                "name": "option 1",
+                "type": "text",
+                "placeholder": "Very Happy"
+            },
+            {
+                "label": "Option 2",
+                "name": "option 2",
+                "type": "text",
+                "placeholder": "Happy"
+            },
+            {
+                "label": "Option 3",
+                "name": "option 3",
+                "type": "text",
+                "placeholder": "Normal"
+            },
+            {
+                "label": "Option 4",
+                "name": "option 4",
+                "type": "text",
+                "placeholder": "Unhappy"
+            },
+            {
+                "label": "Option 5",
+                "name": "option 5",
+                "type": "text",
+                "placeholder": "Very Unhappy"
+            },
+            {
+                "label": "Time interval",
+                "type": "select",
+                "name": "timeinterval",
+                "options": [
+                    {
+                      "label": "2 Minutes",
+                      "value": "2"
+                    },
+                    {
+                      "label": "3 Minutes",
+                      "value": "3"
+                    },
+                    {
+                      "label": "4 Minutes",
+                      "value": "4"
+                    },
+                    {
+                      "label": "5 Minutes",
+                      "value": "5"
+                    }
+                ]
+            },
+            {
+                "label": "Postpone time",
+                "type": "select",
+                "name": "postpone",
+                "options": [
+                    {
+                      "label": "5 Minutes",
+                      "value": "5"
+                    },
+                    {
+                      "label": "10 Minutes",
+                      "value": "10"
+                    },
+                    {
+                      "label": "15 Minutes",
+                      "value": "15"
+                    }
+                ]
+            }
+        ]
+    }
+    return attachments
+}
+
+function postEventDialog() {
+
 }
 
 
 
 
+
+function interDialog(payload) {
+    console.log(payload)
+    console.log(JSON.stringify(payload))
+}
 
 
 

@@ -4,6 +4,12 @@ const request = require('request')
 const textRes = require('./textresponse')
 
 exports.interactivity = function(req, res) {
+    console.log(req.body)
+    console.log(JSON.stringify(req.body))
+    console.log(typeof req.body.payload)
+    console.log(req.body.payload)
+    console.log(JSON.parse(req.body.payload))
+
     let payload = JSON.parse(req.body.payload)
     if(payload.type === 'interactive_message') {
         interButton(payload)

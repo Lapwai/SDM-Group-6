@@ -8,7 +8,7 @@ var bodyParser = require('body-parser');
 
 
 var index = require('./routes/index');
-var slashcommand = require('./routes/slashcommand');
+// var slashcommand = require('./routes/slashcommand');
 var externalapi = require('./routes/externalapi');
 var db = require('./routes/database')
 var bot = require('./controllers/happinessbot')
@@ -39,7 +39,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Important parts
 db.createTables();
 app.use('/', index);
-app.use('/slashcommand', slashcommand)
+// app.use('/slashcommand', slashcommand)
 app.use('/api', externalapi)
 bot.startBot()
 

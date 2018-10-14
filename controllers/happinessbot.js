@@ -16,6 +16,9 @@ function startBot() {
             bot.reply(message, 'Meow. :smile_cat:') 
     })
 
+    controller.hears(['init','Init'], 
+    ['direct_message', 'direct_mention', 'mention'], admin.init)
+
     controller.hears(['conf','Conf','configuration','Configuration'], 
     ['direct_message', 'direct_mention', 'mention'], admin.configuration)
 

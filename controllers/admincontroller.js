@@ -8,76 +8,127 @@ const botkit = require('botkit')
 
 
 
+// exports.init = function(req, res) {
 
-exports.init = function(req, res) {
+exports.init = function(bot, message) {
     let results = db.pgQuery('SELECT * FROM admin;')
     results.then(queryValue => {
-        let team_domain = req.body.team_domain
         if(queryValue.rowCount == 0) {
-            let id = '\'' + req.body.user_id + '\''
-            let name = '\'' + req.body.user_name + '\''
+            let id = '\'' + message.user + '\''
 
-            let insertStr =  'INSERT INTO admin (id, name) VALUES('+ id + ',' + name + ')'
+            let insertStr =  'INSERT INTO admin (id) VALUES('+ id + ')'
             let insert = db.pgQuery(insertStr)
             insert.then(_ => {
-                let mesg = 'Worksapce *' + team_domain + '*\'s new app \' *Happiness Level* \' init success!'
-                textRes.successRes(res,mesg)
+                let mesg = 'Worksapce\'s new app \' *Happiness Level* \' init success!'
+                bot.reply(message, mesg) 
             }).catch(err => {
-                textRes.errorRes(req,res,err.message||err)
+                bot.reply(message, err.message||err)
             })
         } else {
-            textRes.errorRes(req,res,'Workspace ' + team_domain + ' already init!')
+            bot.reply(message, 'Workspace already init!') 
         }    
-            
-    
     }).catch(err => {
-        textRes.errorRes(req,res,err.message||err)
+        bot.reply(message, err.message||err)
     });
 }
 
-exports.configuration = function(bot, message) {
-    bot.reply(message, message + 'Meow. :smile_cat:') 
-
-    // verifyAdmin(req.body.user_id).then(_ => {
-    //     textRes.successRes(res,'Please click the link to setup!\n'+ 'https://sdm-g6.herokuapp.com/index')
-    // }).catch(err => {
-    //     textRes.errorRes(req,res,err.message||err)
-    // })
-}
-
-
-function att() {
+function ConfAtt() {
     let attachments = [{
-        "fallback" : "You can not user this feature!",
-        "mrkdwn_in" : ["pretext","text"],
-        "pretext" : ":mag: *Survey*",
-        'text': title,
-        "color" : "#3AA3E3",
-        "attachment_type" : "default",
-        'callback_id': hash,
-        "actions" : [{
-            "name" : "happiness",
-            "text" : "Pick a happiness level...",
-            "type" : "select"
-            }]
-        }
-    ]
-    let temp = {'scope':'chat:write',
-            'text': '',
+        'fallback' : 'You can not user this feature!',
+        'mrkdwn_in' : ['pretext','text'],
+        'pretext' : ':mag: *Event log*',
+        'text': 'Do you want to setup the configuration of notification?',
+        'color' : '#3AA3E3',
+        'attachment_type' : 'default',
+        'callback_id': 'event log',
+        'actions': [{
+            'name': 'conf',
+            'text': 'Yes',
+            'type': 'button',
+            'value': 'recorder'
+        },{
+            'name': 'conf',
+            'text': 'No',
+            'type': 'button',
+            'value': 'cancel'
+        }]
+    }]
+    let full = {'text': '',
             'response_type' : 'in_channel',
             'attachments': attachments}
 
-    return JSON.stringify(temp)
+    return JSON.stringify(full)
+}
+
+exports.configuration = function(bot, message) {
+    verifyAdmin(message.user).then(_ => {
+        bot.reply(message, ConfAtt) 
+    }).catch(err => {
+        bot.reply(message, err.message||err)
+    })
+}
+
+
+function eventAtt() {
+    let attachments = [{
+        'fallback' : 'You can not user this feature!',
+        'mrkdwn_in' : ['pretext','text'],
+        'pretext' : ':mag: *Event log*',
+        'text': 'Do you want to record an event?',
+        'color' : '#3AA3E3',
+        'attachment_type' : 'default',
+        'callback_id': 'event',
+        'actions': [{
+            'name': 'event',
+            'text': 'Yes',
+            'type': 'button',
+            'value': 'recorder'
+        },{
+            'name': 'event',
+            'text': 'No',
+            'type': 'button',
+            'value': 'cancel'
+        }]
+    }]
+    let full = {'text': '',
+            'response_type' : 'in_channel',
+            'attachments': attachments}
+
+    return JSON.stringify(full)
 }
 
 exports.eventlog = function(bot, message) {
-    console.log(message)
-    bot.reply(message, att()) 
+    verifyAdmin(message.user).then(_ => {
+        bot.reply(message, eventAtt) 
+    }).catch(err => {
+        bot.reply(message, err.message||err)
+    })
 }
+
+/*
+{ type: 'direct_message',
+user: 'UCSLXUNRG',
+text: 'eventlog',
+client_msg_id: '1fa1b599-3dd3-41d1-9a55-22bd65f44921',
+team: 'TCSEYGNKW',
+channel: 'DCS415NQH',
+event_ts: '1539505098.000100',
+ts: '1539505098.000100',
+raw_message:
+{ type: 'message',
+user: 'UCSLXUNRG',
+text: 'eventlog',
+client_msg_id: '1fa1b599-3dd3-41d1-9a55-22bd65f44921',
+team: 'TCSEYGNKW',
+channel: 'DCS415NQH',
+event_ts: '1539505098.000100',
+ts: '1539505098.000100' },
+_pipeline: { stage: 'receive' },
+match: [ 'event', index: 0, input: 'eventlog' ] }
+*/
 
 
 exports.setup = function(req, res) {
-    
     schedule.update()
     textRes.successRes(res, 'test got it');
 }
@@ -269,6 +320,6 @@ function verifyAdmin(user_id) {
 }
 
 
-// {"token":"NoLDQeFvLs2uJmXkbrc1jlEv","team_id":"TCSEYGNKW","team_domain":"sdm-6","channel_id":"GCTJDNRA5","channel_name":"privategroup","user_id":"UCSLXUNRG","user_name":"ioswpf","command":"/init","text":"","response_url":"https://hooks.slack.com/commands/TCSEYGNKW/441441585712/ks8147qG9BaAcmdCI0qaNNbJ","trigger_id":"441581991553.434508566676.747ed520202d5c75a011b6205132d274"}
+// {'token':'NoLDQeFvLs2uJmXkbrc1jlEv','team_id':'TCSEYGNKW','team_domain':'sdm-6','channel_id':'GCTJDNRA5','channel_name':'privategroup','user_id':'UCSLXUNRG','user_name':'ioswpf','command':'/init','text':'','response_url':'https://hooks.slack.com/commands/TCSEYGNKW/441441585712/ks8147qG9BaAcmdCI0qaNNbJ','trigger_id':'441581991553.434508566676.747ed520202d5c75a011b6205132d274'}
 
-// {"token":"NoLDQeFvLs2uJmXkbrc1jlEv","team_id":"TCSEYGNKW","team_domain":"sdm-6","channel_id":"GCTJDNRA5","channel_name":"privategroup","user_id":"UCSLXUNRG","user_name":"ioswpf","command":"/init","text":"@ioswpf","response_url":"https://hooks.slack.com/commands/TCSEYGNKW/442073194851/mcrrmvkTpBbJAFXfRMHmm6oz","trigger_id":"442176950850.434508566676.64c034ded49a0a5238acaa808c9ab6fe"}
+// {'token':'NoLDQeFvLs2uJmXkbrc1jlEv','team_id':'TCSEYGNKW','team_domain':'sdm-6','channel_id':'GCTJDNRA5','channel_name':'privategroup','user_id':'UCSLXUNRG','user_name':'ioswpf','command':'/init','text':'@ioswpf','response_url':'https://hooks.slack.com/commands/TCSEYGNKW/442073194851/mcrrmvkTpBbJAFXfRMHmm6oz','trigger_id':'442176950850.434508566676.64c034ded49a0a5238acaa808c9ab6fe'}

@@ -20,8 +20,7 @@ exports.interactivity = function(req, res) {
     //     textRes.successRes(res,'Got it. \nThe survey will remind you ten minutes later!')
     // }
 
-    
-
+    console.log(JSON.stringify(req.body))
     textRes.successRes(res, 'got it');
 }
 

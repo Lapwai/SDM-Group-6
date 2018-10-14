@@ -11,7 +11,7 @@ router.get('/test', (req, res) => {
 });
 
 // Admin slash command
-router.post('/admin/init', admin_controller.init);
+// router.post('/admin/init', admin_controller.init);
 
 // router.post('/admin/configuration', admin_controller.configuration);
 

@@ -29,8 +29,7 @@ async function pgQuery(queryStr) {
 }
 
 var adminStr = 'CREATE TABLE IF NOT EXISTS admin ( \
-    id                TEXT PRIMARY KEY    NOT NULL, \
-    name              TEXT                NOT NULL \
+    id                TEXT PRIMARY KEY    NOT NULL\
     ); '
 
 // var roleStr = 'CREATE TABLE IF NOT EXISTS role ( \

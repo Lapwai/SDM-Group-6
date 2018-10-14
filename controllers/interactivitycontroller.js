@@ -4,16 +4,13 @@ const request = require('request')
 const textRes = require('./textresponse')
 
 exports.interactivity = function(req, res) {
-
     let payload = JSON.parse(req.body.payload)
 
     if(payload.type === 'interactive_message') {
         interButton(payload)
-        console.log('message')
         textRes.successRes(res, 'Got the message!')
     } else if(payload.type === 'dialog_submission') {
         interDialog(payload)
-        console.log('dialog')
         textRes.successRes(res, 'Got the dialog!')
     } else {
         textRes.errorRes(req,res, req.body.payload)
@@ -22,8 +19,6 @@ exports.interactivity = function(req, res) {
 function interButton(payload) {
     let name = payload.actions[0].name
     let value = payload.actions[0].value
-    console.log(name)
-    console.log(value)
     if(value === 'no') {
         return
     }
@@ -52,7 +47,7 @@ function postConfDialog(trigger_id) {
         },
         body: JSON.stringify(bodyPara)
     };
-    console.log('conf' + options)
+    console.log('conf' + JSON.stringify(options))
     request(options, (err, _, body) => {
         let result = {}
         if((typeof body) === 'string') {
@@ -61,7 +56,10 @@ function postConfDialog(trigger_id) {
             result = body
         }
         if(err || result['error']) {
-            console.log("postdialog err")
+            console.log('post dialog error')
+            console.log(err)
+            console.log(result)
+            console.log( err || result['error'])
         } else {
             console.log('success')
         }

@@ -3,6 +3,7 @@ const db = require('../routes/database')
 const request = require('request')
 const textRes = require('./textresponse')
 const shchedule = require('./schedulecontroller')
+const admin = require('./admincontroller')
 
 exports.interactivity = function(req, res) {
     let payload = JSON.parse(req.body.payload)
@@ -20,13 +21,21 @@ exports.interactivity = function(req, res) {
 function interButton(payload) {
     let name = payload.actions[0].name
     let value = payload.actions[0].value
-    if(value === 'no') {
-        return
-    }
+    
     if(name === 'conf') {
-        postDialog(generateOptions(payload.trigger_id,confAtt()))
-    } else if(name === 'event' ) {
-        postDialog(generateOptions(payload.trigger_id,eventAtt()))
+        if(value === 'yes') {
+            postDialog(generateOptions(payload.trigger_id,confAtt()))
+        }
+    } else if(name === 'event') {
+        if(value === 'yes') {
+            postDialog(generateOptions(payload.trigger_id,eventAtt()))
+        }
+    } else if (anme === 'survey') {
+        if(value === '') {
+
+        } else {
+
+        }
     }
 }
 
@@ -81,19 +90,19 @@ function confAtt() {
                 'options': [
                   {
                     'label': '9:00',
-                    'value': '9'
+                    'value': '9:00'
                   },
                   {
                     'label': '11:00',
-                    'value': '11'
+                    'value': '11:00'
                   },
                   {
                     'label': '13:00',
-                    'value': '13'
+                    'value': '13:00'
                   },
                   {
                     'label': '15:00',
-                    'value': '15'
+                    'value': '15:00'
                   }
                 ]
             },
@@ -110,19 +119,19 @@ function confAtt() {
                 'options': [
                     {
                       'label': '2 Minutes',
-                      'value': '2'
+                      'value': '2 minutes'
                     },
                     {
                       'label': '3 Minutes',
-                      'value': '3'
+                      'value': '3 minutes'
                     },
                     {
                       'label': '4 Minutes',
-                      'value': '4'
+                      'value': '4 minutes'
                     },
                     {
                       'label': '5 Minutes',
-                      'value': '5'
+                      'value': '5 minutes'
                     }
                 ]
             },
@@ -133,15 +142,15 @@ function confAtt() {
                 'options': [
                     {
                       'label': '5 Minutes',
-                      'value': '5'
+                      'value': '5 minutes'
                     },
                     {
                       'label': '10 Minutes',
-                      'value': '10'
+                      'value': '10 minutes'
                     },
                     {
                       'label': '15 Minutes',
-                      'value': '15'
+                      'value': '15 minutes'
                     }
                 ]
             }
@@ -157,19 +166,19 @@ function eventAtt() {
         'elements': [
             {
                 'label': 'Meeting Theme',
-                'name': 'name',
+                'name': 'theme',
                 'type': 'text',
                 'placeholder': 'Please input the meeting theme'
             },
             {
                 'label': 'Meeting date',
-                'name': 'name',
+                'name': 'date',
                 'type': 'text',
                 'placeholder': 'Please input the meeting date such as \"12 Aug 2018\"'
             },
             {
                 'label': 'Meeting time',
-                'name': 'name',
+                'name': 'time',
                 'type': 'text',
                 'placeholder': 'Please input the meeting time such as \"14:20\"'
             }
@@ -182,13 +191,27 @@ function eventAtt() {
 function interDialog(res,payload) {
     if(payload.state === 'conf') {
         shchedule.updateSurvey(payload.submission)
-        res.status(200);
-        res.send('conf insert');
+        textRes.successRes(res, 'conf')
     } else if (payload.state === 'event') {
-        res.status(200);
-        res.send('event insert');
+        textRes.successRes(res,'event')
     }
 }
+function dialogResultAtt() {
+    let attachments = [{
+        'fallback' : 'You can not user this feature!',
+        'mrkdwn_in' : ['pretext','text'],
+        'pretext' : ':mag: *Event log*',
+        'text': '',
+        'color' : '#3AA3E3',
+        'attachment_type' : 'default',
+        'callback_id': 'adfafdadfafdadfasdf'
+    }]
+    return attachments
+}
+
+
+
+
 // {"type":"dialog_submission","token":"NoLDQeFvLs2uJmXkbrc1jlEv","action_ts":"1539539639.051180","team":{"id":"TCSEYGNKW","domain":"sdm-6"},"user":{"id":"UCSLXUNRG","name":"ioswpf"},"channel":{"id":"DCS415NQH","name":"directmessage"},"submission":{"title":"Test title","starttime":"13:00","option":"Very happy; happy; normal; unhappy; hha","timeinterval":"3","postpone":"5"},"callback_id":"conf-dialog","response_url":"https://hooks.slack.com/app/TCSEYGNKW/457285614646/qCeaAQRFq7XK9Nri05A9fMhK","state":"conf"}
 
 

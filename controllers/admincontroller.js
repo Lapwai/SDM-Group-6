@@ -7,9 +7,6 @@ const botkit = require('botkit')
 
 
 
-
-// exports.init = function(req, res) {
-
 exports.init = function(bot, message) {
     let isInit = false
     if('init' === message.text || 'Init' === message.text) { isInit = true }
@@ -24,15 +21,15 @@ exports.init = function(bot, message) {
             let insert = db.pgQuery(insertStr)
             insert.then(_ => {
                 let mesg = 'Worksapce\'s new app \' *Happiness Level* \' init success!'
-                bot.reply(message, mesg) 
+                bot.reply(message, textRes.successMes(mesg)) 
             }).catch(err => {
-                bot.reply(message, err.message||err)
+                bot.reply(message, textRes.errorMes(err.message||err)) 
             })
         } else {
-            bot.reply(message, 'Workspace already init!') 
+            bot.reply(message, textRes.errorMes('Workspace already init!')) 
         }    
     }).catch(err => {
-        bot.reply(message, err.message||err)
+        bot.reply(message, textRes.errorMes(err.message||err)) 
     });
 }
 
@@ -56,7 +53,7 @@ function confAtt() {
         'pretext' : ':mag: *Event log*',
         'text': 'Do you want to setup the configuration of notification?',
         'color' : '#3AA3E3',
-        'attachment_type' : 'default',
+        'attachment_type'  : 'default',
         'callback_id': 'conf',
         'actions': [{
             'name': 'conf',
@@ -94,7 +91,7 @@ function eventAtt() {
         'text': 'Do you want to record an event?',
         'color' : '#3AA3E3',
         'attachment_type' : 'default',
-        'callback_id': 'adfafdadfafdadfasdf',
+        'callback_id': 'event',
         'actions': [{
             'name': 'event',
             'text': 'Yes',
@@ -110,7 +107,7 @@ function eventAtt() {
     return attachments
 }
 
-function postEphemeral(atts,channel, user) {
+function postEphemeral(atts, channel, user) {
     let bodyPara = {'scope':'bot',
                 'channel':channel,
                 'user':user,
@@ -177,6 +174,8 @@ function verifyAdmin(user_id) {
 }
 
 
+
+module.exports = {postEphemeral}
 
 
 {

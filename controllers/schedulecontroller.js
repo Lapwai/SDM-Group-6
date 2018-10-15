@@ -1,8 +1,46 @@
 const app = require('../app')
 const db = require('../routes/database')
 const request = require('request')
-const schedule = require('node-schedule')
+const nodeSchedule = require('node-schedule')
 
+
+// default schedule -  eveyday 0am to check the new survey setting
+function defaultSchedule() {
+    let job = nodeSchedule.scheduleJob('* * 0 * * 1-5', function() {
+        checkSurvey()
+    });
+}
+function checkSurvey() {
+    let selectStr = 'SELECT * from survey WHERE id=(SELECT Max(id) from survey);'
+    db.pgQuery(selectStr).then(value => {
+        addTodaySurvey(value.rows[0])
+    }).catch(err => {
+        console.log(err)
+    })
+}
+
+function addTodaySurvey(value) {
+    // let starttime = value['starttime']
+    // let job = nodeSchedule.scheduleJob()
+}
+
+
+function updateSurvey(submission) {
+    let title = submission.title
+    let starttime = submission.starttime
+    let option = submission.option
+    let timeinterval = submission.timeinterval
+    let postpone = submission.postpone
+
+    insertSurvey(title,starttime,option,timeinterval,postpone)
+    .then(_ => {
+        console.log('insert survey success')
+        addNewSchedule(starttime)
+    }).catch(err => {
+        console.log('insert survey err')
+        console.log(err)
+    }) 
+}
 function insertSurvey(title, starttime, option, interval, postpone) {
     return new Promise((resolve, reject) => {
         let insertSql = 'INSERT INTO survey(title, starttime, option, timeinterval, postpone) VALUES (\'' + title + '\', \'' + starttime + '\', \'' + option + '\', \'' +  + interval + '\', \'' +  + postpone + '\');';
@@ -15,22 +53,9 @@ function insertSurvey(title, starttime, option, interval, postpone) {
     })
 }
 
-function updateSurvey(submission) {
-    let title = submission.title
-    let starttime = submission.starttime
-    let option = submission.option
-    let timeinterval = submission.timeinterval
-    let postpone = submission.postpone
+function addNewSchedule(starttime) {
 
-    insertSurvey(title,starttime,option,timeinterval,postpone)
-    .then(_ => {
-        console.log('insert survey success')
-    }).catch(err => {
-        console.log('insert survey err')
-        console.log(err)
-    }) 
 }
-
 
 // post survey
 function post(hash,params,channelID) {

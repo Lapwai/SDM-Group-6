@@ -58,24 +58,41 @@ var feedbacksStr = 'CREATE TABLE IF NOT EXISTS feedbacks ( \
     ); '   
 
 function addDefault() {
-    let title = 'Just remind it is your time to submit your happiness information. Choose a button to click.'
-    let starttime = '15:00'
-    let option = 'Very happy|Happy|Normal|Unhappy|Very unhappy'
-    let interval = '2 minutes'
-    let postpone = '5 minutes'
+    checkDefault().then(value => {
+        console.log(value)
+        return ''
+    }).catch(_ => {
+        let title = 'Just remind it is your time to submit your happiness information. Choose a button to click.'
+        let starttime = '15:00'
+        let option = 'Very happy;Happy;Normal;Unhappy;Very unhappy'
+        let interval = '2 minutes'
+        let postpone = '5 minutes'
 
-    let insertStr = 'INSERT INTO survey(title, starttime, option, timeinterval, postpone) VALUES (\'' + title + '\', \'' + starttime + '\', \'' + option + '\', \'' + interval + '\', \'' +  postpone + '\');';
-    return insertStr
+        let insertStr = 'INSERT INTO survey(title, starttime, option, timeinterval, postpone) VALUES (\'' + title + '\', \'' + starttime + '\', \'' + option + '\', \'' + interval + '\', \'' +  postpone + '\');';
+        return insertStr
+    })
+
+}
+function checkDefault() {
+    return new Promise((resolve, reject) => {
+        pgQuery("SELECT * FROM survey;").then(value => {
+            if(value.rowCount !== 0){
+                resolve('already has default')
+            } else {
+                reject('')
+            }
+        }).catch(err => {
+            reject(err.message, err)
+        })
+    })
 }
 
 async function createTables() { 
-
     pgQuery(adminStr)
     pgQuery(surveyStr).then(_ => {
         pgQuery(addDefault())
     })
     pgQuery(feedbacksStr)
-
 }
 
 module.exports = {pgQuery, createTables};

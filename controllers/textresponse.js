@@ -1,5 +1,33 @@
 var app = require('../app')
 
+function successMes(text) {
+    var responseObject = {
+        'attachments': [{
+            'fallback': 'Required plain-text summary of the attachment.',
+            'color': 'good',          
+            'pretext': ':tada: *Success*',
+            'text': text,
+            'attachment_type': 'default',
+            'mrkdwn_in': ['text','pretext'],
+        }]
+    }
+    return JSON.stringify(responseObject)
+}
+function errorMes(text) {
+    var responseObject = {
+        'attachments': [{
+            'fallback': 'Required plain-text summary of the attachment.',
+            'color': 'danger',
+            'pretext': ':hankey: *Error*',
+            'text': text,
+            'attachment_type': 'default',
+            'mrkdwn_in': ['text','pretext'],
+        }]
+    }
+    return JSON.stringify(responseObject)
+}
+
+
 function successRes(res,text) {
     var responseObject = {
         'attachments': [{
@@ -65,4 +93,4 @@ function buttonRes(res,error) {
 
 }
 
-module.exports = {successRes, errorRes, buttonRes};
+module.exports = {successMes, errorMes, successRes, errorRes, buttonRes};

@@ -64,33 +64,4 @@ function errorRes(req,res,text) {
     res.send(JSON.stringify(responseObject));
 }
 
-
-
-function buttonRes(res,error) {
-    var responseObject = {
-        'attachments': [{
-                'fallback': 'Required plain-text summary of the attachment.',
-                'callback_id': 'admin_delete',
-                'color': '#3AA3E3',
-                'pretext': ':bangbang: *Alert*',
-                'text': 'Are you sure to delete \nasdasda\n asdad \n?',
-                'mrkdwn_in': ['text','pretext'],
-                'attachment_type': 'default',
-                'actions': [{
-                    'name': 'admin_delete',
-                    'text': 'Delete',
-                    'style': 'danger',
-                    'type': 'button',
-                    'value': 'delete'
-                },{
-                    'name': 'admin_delete',
-                    'text': 'Cancel',
-                    'type': 'button',
-                    'value': 'cancel'
-                }]
-        }]
-    }
-
-}
-
-module.exports = {successMes, errorMes, successRes, errorRes, buttonRes};
+module.exports = {successMes, errorMes, successRes, errorRes};

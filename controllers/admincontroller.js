@@ -140,6 +140,10 @@ function postEphemeral(atts, channel, user) {
     })
 }
 
+exports.publicCostEphemeral = function(atts, channel, user) {
+    postEphemeral(atts,channel,user)
+}
+
 /*
 {"type":"direct_message","user":"UCSLXUNRG","text":"event ahah","client_msg_id":"db89d447-0aaa-41aa-8d4d-7cea545b24f4","team":"TCSEYGNKW","channel":"DCS415NQH","event_ts":"1539523136.000100","ts":"1539523136.000100","raw_message":{"type":"message","user":"UCSLXUNRG","text":"event ahah","client_msg_id":"db89d447-0aaa-41aa-8d4d-7cea545b24f4","team":"TCSEYGNKW","channel":"DCS415NQH","event_ts":"1539523136.000100","ts":"1539523136.000100"},"_pipeline":{"stage":"receive"},"match":["event"]}
 admincontroller.js:101
@@ -173,9 +177,6 @@ function verifyAdmin(user_id) {
     })
 }
 
-
-
-module.exports = {postEphemeral}
 
 
 {

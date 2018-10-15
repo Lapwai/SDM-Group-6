@@ -60,7 +60,6 @@ var feedbacksStr = 'CREATE TABLE IF NOT EXISTS feedbacks ( \
 function addDefault() {
     checkDefault().then(value => {
         console.log(value)
-        return ''
     }).catch(_ => {
         let title = 'Just remind it is your time to submit your happiness information. Choose a button to click.'
         let starttime = '15:00'
@@ -69,7 +68,7 @@ function addDefault() {
         let postpone = '5 minutes'
 
         let insertStr = 'INSERT INTO survey(title, starttime, option, timeinterval, postpone) VALUES (\'' + title + '\', \'' + starttime + '\', \'' + option + '\', \'' + interval + '\', \'' +  postpone + '\');';
-        return insertStr
+        pgQuery(insertStr)
     })
 
 }
@@ -90,7 +89,7 @@ function checkDefault() {
 async function createTables() { 
     pgQuery(adminStr)
     pgQuery(surveyStr).then(_ => {
-        pgQuery(addDefault())
+        addDefault()
     })
     pgQuery(feedbacksStr)
 }

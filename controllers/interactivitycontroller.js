@@ -7,13 +7,13 @@ const admin = require('./admincontroller')
 
 exports.interactivity = function(req, res) {
     let payload = JSON.parse(req.body.payload)
-
     if(payload.type === 'interactive_message') {
         interButton(payload)
-        textRes.successRes(res, 'Got the message!')
+        textRes.successRes(res, 'Got your submit!')
     } else if(payload.type === 'dialog_submission') {
-        interDialog(res,payload)
-        // textRes.successRes(res, 'Got the dialog!')
+        interDialog(payload)
+        res.status(200)
+        res.send();
     } else {
         textRes.errorRes(req,res, req.body.payload)
     }
@@ -188,25 +188,12 @@ function eventAtt() {
 }
 
 
-function interDialog(res,payload) {
+function interDialog(payload) {
     if(payload.state === 'conf') {
         shchedule.updateSurvey(payload.submission)
-        admin.publicCostEphemeral(textRes.successMes('Setup configuration success!'),payload.channel.id,payload.user.id)
     } else if (payload.state === 'event') {
-        admin.publicCostEphemeral(textRes.successMes('Record event success!'),payload.channel.id,payload.user.id)
+        
     }
-}
-function dialogResultAtt() {
-    let attachments = [{
-        'fallback' : 'You can not user this feature!',
-        'mrkdwn_in' : ['pretext','text'],
-        'pretext' : ':mag: *Event log*',
-        'text': '',
-        'color' : '#3AA3E3',
-        'attachment_type' : 'default',
-        'callback_id': 'adfafdadfafdadfasdf'
-    }]
-    return attachments
 }
 // {"type":"dialog_submission","token":"NoLDQeFvLs2uJmXkbrc1jlEv","action_ts":"1539539639.051180","team":{"id":"TCSEYGNKW","domain":"sdm-6"},"user":{"id":"UCSLXUNRG","name":"ioswpf"},"channel":{"id":"DCS415NQH","name":"directmessage"},"submission":{"title":"Test title","starttime":"13:00","option":"Very happy; happy; normal; unhappy; hha","timeinterval":"3","postpone":"5"},"callback_id":"conf-dialog","response_url":"https://hooks.slack.com/app/TCSEYGNKW/457285614646/qCeaAQRFq7XK9Nri05A9fMhK","state":"conf"}
 

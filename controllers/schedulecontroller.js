@@ -56,11 +56,9 @@ function insertSurvey(title, starttime, option, timeinterval, postpone) {
 function postSurveyNotification() {    
     queryGeneralMembers().then(members => {
         queryAdminID().then(admin => {
-            // let users = []
             members.forEach(e => {
                 if(e !== admin.id) {
-                    // users.push(e)
-                    openChannelWithUsers(e)
+                    openChannelWithUser(e)
                 }
             });
         })
@@ -99,7 +97,7 @@ function queryAdminID() {
         })
     })
 }
-function openChannelWithUsers(user) {
+function openChannelWithUser(user) {
     let bodyPara = {'users':user}
     let options = {
         url: '	https://slack.com/api/conversations.open',
@@ -131,7 +129,7 @@ function openChannelWithUsers(user) {
         }
     })
 }
-function querySurveyContent(users) {
+function querySurveyContent() {
     return new Promise((resolve, reject) => {
         let selectStr = 'SELECT * FROM survey WHERE id=(SELECT Max(id) from survey);'
         db.pgQuery(selectStr).then(value => {
@@ -150,7 +148,7 @@ function gengerateAttachment(id,title,minutes) {
         "fallback" : "You can not user this feature!",
         "mrkdwn_in" : ["pretext","text"],
         "pretext" : ":mag: *Survey*",
-        'text': title + '\nDo you do it now?',
+        'text': title + '\nDo you want to do it now?',
         "color" : "#3AA3E3",
         "attachment_type" : "default",
         'callback_id': id,
@@ -164,7 +162,7 @@ function gengerateAttachment(id,title,minutes) {
                 "text": minutes + " minutes later",
                 "type": "button",
                 "style": "danger",
-                "value": "postpone"
+                "value": "" + minutes
             }]
         }
     ]
@@ -201,7 +199,17 @@ function postNotificationToUser(atts, channel) {
 }
 
 
+function postponeSurvey(payload) {
+    console.log("postpone=" + JSON.stringify(payload))
+    var second = 1000 * parseInt(payload.actions[0].value)
+    setTimeout(function() {
+        openChannelWithUser(payload.user.id)
+    }, second);
+}
 
+/*
+{"actions":[{"name":"recommend","value":"recommend","type":"button"}],"callback_id":"comic_1234_xyz","channel":{"id":"C065W1189","name":"forgotten-works"},"message_ts":"1458170866.000004","response_url":"https://hooks.slack.com/actions/T47563693/6204672533/x7ZLaiVMoECAW50Gw1ZYAXEM","type":"interactive_message","team":{"id":"T47563693","domain":"watermelonsugar"},"action_ts":"1458170917.164398","token":"xAB3yVzGS4BQ3O9FACTa8Ho4","trigger_id":"13345224609.738474920.8088930838d88f008e0","user":{"id":"U045VRZFT","name":"brautigan"},"attachment_id":"1"}
+*/
 
 // run 
 function runloop() {
@@ -212,4 +220,4 @@ function runloop() {
 
 
 
-module.exports = {updateSurvey,postSurveyNotification}
+module.exports = {updateSurvey,postSurveyNotification,postponeSurvey}

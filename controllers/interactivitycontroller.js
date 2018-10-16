@@ -38,7 +38,7 @@ function interButton(payload) {
                 console.log('post survey err='+err)
             })
         } else {
-            console.log('post survey postpone')
+            shchedule.postponeSurvey(payload)
         }
     } else {
         console.log('interactivity button ' + name )
@@ -204,7 +204,6 @@ function querySurveyContent() {
                 options.push({'label':e, 'value':''+i})           
             })
             let att = surveyAtt(options)
-            console.log(att)
             resolve(att)
         }).catch(err => {
             reject(err.message||err)

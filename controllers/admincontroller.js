@@ -20,16 +20,16 @@ exports.init = function(bot, message) {
             let insertStr =  'INSERT INTO admin (id) VALUES('+ id + ')'
             let insert = db.pgQuery(insertStr)
             insert.then(_ => {
-                let mesg = 'Worksapce\'s new app \' *Happiness Level* \' init success!'
-                bot.reply(message, textRes.successMes(mesg)) 
+                let msg = 'Worksapce\'s new app \' *Happiness Level* \' init success!'
+                postMessage(textRes.successMes(msg),message.channel, message.user,false)
             }).catch(err => {
-                bot.reply(message, textRes.errorMes(err.message||err)) 
+                postMessage(textRes.errorMes(err.message||err),message.channel, message.user,false)
             })
         } else {
-            bot.reply(message, textRes.errorMes('Workspace already init!')) 
+            postMessage(textRes.errorMes('Workspace already init!'),message.channel, message.user,false)
         }    
     }).catch(err => {
-        bot.reply(message, textRes.errorMes(err.message||err)) 
+        postMessage(textRes.errorMes(err.message||err),message.channel, message.user,false)
     });
 }
 

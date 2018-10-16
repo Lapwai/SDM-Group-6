@@ -42,7 +42,7 @@ exports.configuration = function(bot, message) {
     verifyAdmin(message.user).then(_ => {
         postMessage(confAtt(),message.channel)
     }).catch(err => {
-        bot.reply(message, err.message||err)
+        postMessage(textRes.errorMes(err.message||err),message.channel)
     })
 }
 function confAtt() {
@@ -140,26 +140,12 @@ exports.publicPostMsg = function(atts, channel) {
     postMessage(atts,channel)
 }
 
-/*
-{"type":"direct_message","user":"UCSLXUNRG","text":"event ahah","client_msg_id":"db89d447-0aaa-41aa-8d4d-7cea545b24f4","team":"TCSEYGNKW","channel":"DCS415NQH","event_ts":"1539523136.000100","ts":"1539523136.000100","raw_message":{"type":"message","user":"UCSLXUNRG","text":"event ahah","client_msg_id":"db89d447-0aaa-41aa-8d4d-7cea545b24f4","team":"TCSEYGNKW","channel":"DCS415NQH","event_ts":"1539523136.000100","ts":"1539523136.000100"},"_pipeline":{"stage":"receive"},"match":["event"]}
-admincontroller.js:101
-*/
-
-
-exports.setup = function(req, res) {
-    schedule.update()
-    textRes.successRes(res, 'test got it');
-}
-
-
-
-
 function verifyAdmin(user_id) {
     return new Promise((resolve, reject) => {
         let results = db.pgQuery('SELECT id FROM admin;')
         results.then(value => {
             if(value.rowCount === 0) {
-                reject('Workspace needs init first! \n `/admin_init`')
+                reject('Workspace needs init first!')
             } else {
                 if(user_id !== value.rows[0]['id']) {
                     reject('Only Admin can use this command!')
@@ -167,8 +153,8 @@ function verifyAdmin(user_id) {
                     resolve('')
                 }
             }
-        }).catch(error => {
-            reject(error.message||err)
+        }).catch(err => {
+            reject(err.message||err)
         })
     })
 }

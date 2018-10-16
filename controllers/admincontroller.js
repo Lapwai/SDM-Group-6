@@ -110,7 +110,6 @@ function postMessage(atts, channel) {
     let bodyPara = {
                 'channel':channel,
                 'attachments':atts}
-    console.log(JSON.stringify(bodyPara))
     let options = {
         url: 'https://slack.com/api/chat.postMessage',
         method:'POST',
@@ -217,6 +216,7 @@ function verifyAdmin(user_id) {
 //         return [true,'']
 //     }
 // }
+
 // function addRequestMembers() {
 //     return new Promise((resolve, reject) => {
 //         let options = {
@@ -242,8 +242,8 @@ function verifyAdmin(user_id) {
 //             resolve(members)
 //         })
 //     })
-    
 // }
+
 // function addGenerateSql(role, users, members) {
 //     var dict = []
 //     for(let i = 0; i<members.length; i++) {

@@ -69,7 +69,7 @@ function checkDefault() {
     return new Promise((resolve, reject) => {
         pgQuery("SELECT * FROM survey;").then(value => {
             if(value.rowCount !== 0){
-                resolve('already has default')
+                resolve('Already has default survey')
             } else {
                 reject('')
             }
@@ -86,8 +86,8 @@ function addEvent(payload) {
     let date = payload.submission.date
     let time = payload.submission.time
     insertEvent(member_id,member_name,theme,date,time)
-    .then(_ => {
-        console.log('insert event success')
+    .then(value => {
+        console.log(value)
     }).catch(err => {
         console.log('insert event err')
         console.log(err)
@@ -99,8 +99,32 @@ function insertEvent(member_id, member_name, theme, date, time) {
         let insertSql = 'INSERT INTO feedbacks(member_id, member_name, ts, option, comment) VALUES (\'' + member_id + '\', \'' + member_name + '\', \'now\', \'-1\', \'' + comment + '\');';
         console.log('insert event sql='+insertSql)
         pgQuery(insertSql).then(_ => {
-            resolve('')
-            console.log('insert new survey success!')
+            resolve('insert new event success!')
+        }).catch(err => {
+            reject(err.message || err)
+        })
+    })
+}
+
+function addFeedback(payload) {
+    let member_id = payload.user.id
+    let member_name = payload.user.name
+    let level = payload.submission.level
+    let comment = payload.submission.comment
+    insertFeedback(member_id, member_name, level, comment)
+    .then(value => {
+        console.log(value)
+    }).catch(err => {
+        console.log('insert event err')
+        console.log(err)
+    }) 
+}
+function insertFeedback(member_id, member_name, level, comment) {
+    return new Promise((resolve, reject) => {
+        let insertSql = 'INSERT INTO feedbacks(member_id, member_name, ts, option, comment) VALUES (\'' + member_id + '\', \'' + member_name + '\', \'now\', \'' + level + '\', \'' + comment + '\');';
+        console.log('insert feedback sql='+insertSql)
+        pgQuery(insertSql).then(_ => {
+            resolve('insert new feedback success!')
         }).catch(err => {
             reject(err.message || err)
         })
@@ -115,5 +139,5 @@ async function createTables() {
     pgQuery(feedbacksStr)
 }
 
-module.exports = {pgQuery, createTables, addEvent};
+module.exports = {pgQuery, createTables, addEvent, addFeedback};
 

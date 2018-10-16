@@ -9,7 +9,7 @@ exports.interactivity = function(req, res) {
     let payload = JSON.parse(req.body.payload)
     if(payload.type === 'interactive_message') {
         interButton(payload)
-        textRes.successRes(res, 'Got your submit!')
+        textRes.successRes(res, 'Got it!')
     } else if(payload.type === 'dialog_submission') {
         interDialog(payload)
         res.status(200)
@@ -30,11 +30,15 @@ function interButton(payload) {
         if(value === 'yes') {
             postDialog(generateOptions(payload.trigger_id,eventAtt()))
         }
-    } else if (anme === 'survey') {
-        if(value === '') {
-
+    } else if (name === 'survey') {
+        if(value === 'now') {
+            querySurveyContent().then(att => {
+                postDialog(generateOptions(payload.trigger_id,att))
+            }).catch(err => {
+                console.log()
+            })
         } else {
-
+            // postpone
         }
     }
 }
@@ -186,7 +190,47 @@ function eventAtt() {
     }
     return attachments
 }
-
+function querySurveyContent() {
+    return new Promise((resolve, reject) => {
+        let selectStr = 'SELECT * FROM survey WHERE id=(SELECT Max(id) from survey);'
+        db.pgQuery(selectStr).then(value => {
+            let temp = value.rows[0].postpone.option.split(';').map( str => {
+                return str.trim()
+            })
+            let options = []
+            temp.forEach(function(e,i) {
+                options.push({'label':e, 'value':''+i})           
+            })
+            let att = surveyAtt(options)
+            resolve(att)
+        }).catch(err => {
+            reject(err.message||err)
+        })
+    })
+}
+function surveyAtt(options) {
+    let attachments ={
+        'callback_id': 'survey',
+        'title': 'Survey',
+        'state': 'survey',
+        'elements': [
+            {
+                'label': 'Happiness Level',
+                'type': 'select',
+                'name': 'level',
+                'options': options
+            },
+            {
+                'label': 'Comment',
+                'name': 'comment',
+                'type': 'textarea',
+                'optional': 'true',
+                'placeholder': 'Provide additional information if needed.'
+            }
+        ]
+    }
+    return attachments
+}
 
 function interDialog(payload) {
     if(payload.state === 'conf') {
@@ -195,40 +239,14 @@ function interDialog(payload) {
     } else if (payload.state === 'event') {
         db.addEvent(payload)
         admin.publicPostMsg(textRes.successMes('Record event success!'),payload.channel.id)
+    } else if (payload.state === 'survey') {
+        db.addFeedback(payload)
+        admin.publicPostMsg(textRes.successMes('Your feedback Submit success!'),payload.channel.id)
     }
 }
 
 
 // {"type":"dialog_submission","token":"NoLDQeFvLs2uJmXkbrc1jlEv","action_ts":"1539539639.051180","team":{"id":"TCSEYGNKW","domain":"sdm-6"},"user":{"id":"UCSLXUNRG","name":"ioswpf"},"channel":{"id":"DCS415NQH","name":"directmessage"},"submission":{"title":"Test title","starttime":"13:00","option":"Very happy; happy; normal; unhappy; hha","timeinterval":"3","postpone":"5"},"callback_id":"conf-dialog","response_url":"https://hooks.slack.com/app/TCSEYGNKW/457285614646/qCeaAQRFq7XK9Nri05A9fMhK","state":"conf"}
-
-
-
-
-
-// function generateSql(payload) {
-//     return new Promise((resolve, reject) => {
-//         let callback_id = payload.callback_id
-//         db.pgQuery('SELECT * FROM survey WHERE hash = \'' + callback_id + '\';')
-//         .then(survey_ids => {
-//             if(survey_ids.rowCount === 0) {
-//                 reject('Did not find the survey!')
-//             }
-//             let survey_id = survey_ids.rows[0]['id']
-//             let member_id = payload.user.id
-//             let channel_id = payload.channel.id
-//             let channel_name = payload.channel.name
-//             let ts = '\'now\''
-//             let option = payload.actions[0].selected_options[0].value
-
-//             let str = 'INSERT INTO feedbacks(survey_id,member_id,channel_id,channel_name,ts,option) VALUES (';
-//             str = str.concat(survey_id,',\'',member_id,'\',\'',channel_id,'\',\'',channel_name,'\',',ts,',\'',option,'\');')
-//             resolve(str)
-//         }).catch(err => {
-//             reject(err.message||err)
-//         })
-//     })
-// }
-
 
 
 // {

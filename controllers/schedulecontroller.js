@@ -4,14 +4,14 @@ const request = require('request')
 const nodeSchedule = require('node-schedule')
 
 
-// default schedule -  eveyday 0am to check the new survey setting
+// default schedule -  eveyday 0am the system will check the lastest survey confuguration
 function defaultSchedule() {
     let job = nodeSchedule.scheduleJob('* * 0 * * 1-5', function() {
         checkSurvey()
     });
 }
 function checkSurvey() {
-    let selectStr = 'SELECT * from survey WHERE id=(SELECT Max(id) from survey);'
+    let selectStr = 'SELECT * FROM survey WHERE id=(SELECT Max(id) from survey);'
     db.pgQuery(selectStr).then(value => {
         addTodaySurvey(value.rows[0])
     }).catch(err => {
@@ -20,11 +20,10 @@ function checkSurvey() {
 }
 
 function addTodaySurvey(value) {
-    // let starttime = value['starttime']
-    // let job = nodeSchedule.scheduleJob()
+    console.log('today survey')
 }
 
-
+// when admin submit new configuration will invoke this method
 function updateSurvey(submission) {
     let title = submission.title
     let starttime = submission.starttime
@@ -53,44 +52,26 @@ function insertSurvey(title, starttime, option, timeinterval, postpone) {
     })
 }
 
-
-
-
-
-// post survey
-function post(hash,params,channelID) {
-    let attachments = gengerateAttachment(hash,params)
-    let bodyParams = {'scope':'chat:write',
-                'channel': channelID,
-                'text': '',
-                'response_type' : 'in_channel',
-                'attachments': attachments}
-    let options = {
-        url: 'https://slack.com/api/chat.postMessage',
-        method:'POST',
-        headers: {
-            'User-Agent': 'SDM Test',
-            'content-type': 'application/json; charset=utf-8',
-            'Authorization' : 'Bearer xoxa-2-434508566676-445609127334-444065434292-a41d63c89c65b7a2a9bacc9bfe61faa4'
-        },
-        body: JSON.stringify(bodyParams)
-    };
-
-    function callBack(error, _, _) {
-        if(error) {
-            console.log(error)
-        } else {
-            console.log('post survey success')
-        }
-    }
-    request(options, callBack)
+// post survey notifcation to a channel
+function postSurveyNotification() {    
+    queryGeneralMembers().then(members => {
+        queryAdminID().then(admin => {
+            // let users = []
+            members.forEach(e => {
+                if(e !== admin.id) {
+                    // users.push(e)
+                    openChannelWithUsers(e)
+                }
+            });
+        })
+    }).catch(err => {
+        console.log('post survey notification error =' + err)
+    })
 }
-
-function queryChannelID(name) {
-    return new Promise(function(resolve, reject) {
+function queryGeneralMembers() {
+    return new Promise((resolve, reject) => {
         let options = {
-            url: 'https://slack.com/api/conversations.list?token=xoxa-2-434508566676-445609127334-444065434292-a41d63c89c65b7a2a9bacc9bfe61faa4&scope=conversations:read',
-            headers: {'User-Agent': 'SDM Test'}
+            url: 'https://slack.com/api/channels.info?token=xoxb-434508566676-433992928064-cHxo9Ahshc7WvBOQ7m3yn3Fc&channel=CCSEYGWQL&pretty=1'   
         };
         request(options, (err, _, body) => {
             let result = {}
@@ -98,46 +79,129 @@ function queryChannelID(name) {
                 result = JSON.parse(body)
             } else {
                 result = body
-            }            
+            }
             if(err || result['error']) {
                 reject(err || result['error'])
-            }
-            let channelID = ''
-            result['channels'].forEach(e => {
-                if(name.substring(1) == e['name']) {
-                    channelID = e['id']
-                }
-            })
-            if(channelID.length === 0){
-                reject('Did not find the channel!')
             } else {
-                resolve(channelID)
-            }
-        }) 
+                let members = result.channel.members
+                resolve(members)
+            }            
+        })
     })
 }
+function queryAdminID() {
+    return new Promise((resolve, reject) => {
+        let sqlStr = 'select * from admin;'
+        db.pgQuery(sqlStr).then(value => {
+            resolve(value.rows[0])
+        }).catch(err => {
+            reject(err.message||err)
+        })
+    })
+}
+function openChannelWithUsers(user) {
+    let bodyPara = {'users':user}
+    let options = {
+        url: '	https://slack.com/api/conversations.open',
+        method:'POST',
+        headers: {
+            'scope':'bot',
+            'User-Agent': 'SDM Test',
+            'content-type': 'application/json; charset=utf-8',
+            'Authorization' : 'Bearer xoxb-434508566676-433992928064-cHxo9Ahshc7WvBOQ7m3yn3Fc'
+        },
+        body: JSON.stringify(bodyPara)
+    };
+    request(options, (err, _, body) => {
+        let result = {}
+        if((typeof body) === 'string') {
+            result = JSON.parse(body)
+        } else {
+            result = body
+        }
+        if(err || result['error']) {
+            console.log('open channel with user err='+(err || result['error']))
+        } else {
+            let channel = result.channel.id
+            querySurveyContent().then(att => {
+                postNotificationToUser(att, channel)
+            }).catch(err => {
 
-
-
-function gengerateAttachment(title,option) {
-
+            })
+        }
+    })
+}
+function querySurveyContent(users) {
+    return new Promise((resolve, reject) => {
+        let selectStr = 'SELECT * FROM survey WHERE id=(SELECT Max(id) from survey);'
+        db.pgQuery(selectStr).then(value => {
+            let id = value.rows[0].id
+            let title = value.rows[0].title
+            let minutes = value.rows[0].postpone.minutes
+            console.log(value.rows[0])
+            let att = gengerateAttachment(id,title,minutes)
+            resolve(att)
+        }).catch(err => {
+            reject(err.message||err)
+        })
+    })   
+}
+function gengerateAttachment(id,title,minutes) {
     let attachments = [{
         "fallback" : "You can not user this feature!",
         "mrkdwn_in" : ["pretext","text"],
         "pretext" : ":mag: *Survey*",
-        'text': title,
+        'text': title + '\nDo you do it now?',
         "color" : "#3AA3E3",
         "attachment_type" : "default",
-        'callback_id': hash,
+        'callback_id': id,
         "actions" : [{
-            "name" : "happiness",
-            "text" : "Pick a happiness level...",
-            "type" : "select"
+                "name": "survey",
+                "text": "Now",
+                "type": "button",
+                "value": "now"
+            },{
+                "name": "survey",
+                "text": minutes + " minutes later",
+                "type": "button",
+                "style": "danger",
+                "value": "postpone"
             }]
         }
     ]
     return attachments
 }
+function postNotificationToUser(atts, channel) {
+    let bodyPara = {
+                'channel':channel,
+                'attachments':atts}
+    let options = {
+        url: 'https://slack.com/api/chat.postMessage',
+        method:'POST',
+        headers: {
+            'scope':'bot',
+            'User-Agent': 'SDM Test',
+            'content-type': 'application/json; charset=utf-8',
+            'Authorization' : 'Bearer xoxb-434508566676-433992928064-cHxo9Ahshc7WvBOQ7m3yn3Fc'
+        },
+        body: JSON.stringify(bodyPara)
+    };
+    request(options, (err, _, body) => {
+        let result = {}
+        if((typeof body) === 'string') {
+            result = JSON.parse(body)
+        } else {
+            result = body
+        }
+        if(err || result['error']) {
+            console.log('post error'+(err || result['error']))
+        } else {
+            console.log('post success')
+        }
+    })
+}
+
+
 
 
 // run 
@@ -149,4 +213,4 @@ function runloop() {
 
 
 
-module.exports = {updateSurvey}
+module.exports = {updateSurvey,postSurveyNotification}

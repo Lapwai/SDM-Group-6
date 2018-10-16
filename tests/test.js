@@ -3,9 +3,7 @@ let expect = require("chai").expect;
 const app = require('../app')
 var http = require('http')
 var request = require('supertest');
-const botkit = require('botkit')
 const server_url = 'https://sdm-g6.herokuapp.com/'
-var admincontroller = require('../controllers/admincontroller');
 var process_messageText =  require('../controllers/admincontroller').process_messageText;
 
 describe('unit_open_configurationPage_for_admin', function () {

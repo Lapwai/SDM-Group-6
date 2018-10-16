@@ -31,31 +31,34 @@ exports.init = function(bot, message) {
         postMessage(textRes.errorMes(err.message||err),message.channel)
     });
 }
+
 //Process configration command and display a correct page for admin. when the auth is right, show configrationPage, or give a message. 
 exports.open_configurationPage_for_admin= function(bot, message) {
     let texts = ['conf','Conf','configuration','Configuration']
     isConf = false
-    isConf=process_configuration_messageText(isConf,texts,message)//process admin's command
+    isConf=process_messageText(isConf,texts,message)//process admin's command
     if(isConf == false ) { return } 
-    configuration_verifyAdmin_auth(bot,message)//verify admin auth and post correct page
-    return isConf;
+    configuration_verifyAdmin_auth(message)//verify admin auth and post correct page
 }
+
 //process admin's command
-function process_configuration_messageText(isConf,texts,message){
+function process_messageText(isConf,texts,message){
     texts.forEach(e => {
         if(e === message.text) { isConf = true }  
     }); 
     return isConf;
 }
+
 //verify admin auth and post correct page
-function configuration_verifyAdmin_auth(bot,message){
+function configuration_verifyAdmin_auth(message){
     verifyAdmin(message.user).then(_ => {
         postMessage(confAtt(),message.channel) //confAtt() is when admin auth is right, post this slack page to admin
     }).catch(err => {
-        bot.reply(message, err.message||err)//return err message
+        postMessage(textRes.errorMes(err.message||err),message.channel)
     })
 }
-//When admin auth is right, post this slack page to admin
+
+//When admin auth is correct, post this string to api function
 function confAtt() {
     let attachments = [{
         'fallback' : 'You can not user this feature!',
@@ -80,19 +83,24 @@ function confAtt() {
     return attachments
 }
 
+//Process logger command and display a correct page for admin. when the auth is right, show event, or give a message. 
 exports.eventlog = function(bot, message) {
     let texts = ['event','Event','eventlog','Eventlog']
     let isEvent = false
-    texts.forEach(e => {
-        if(e === message.text) { isEvent = true }
-    });
+    isEvent=process_messageText(isEvent,texts,message)
     if(isEvent == false ) { return }
+    event_verifyAdmin_auth(message);
+}
+
+//verify logger auth and post correct page
+function event_verifyAdmin_auth(message){
     verifyAdmin(message.user).then(_ => {
-        postMessage(eventAtt(),message.channel)
+        postMessage(eventAtt(),message.channel) //confAtt() is when admin auth is right, post this slack page to admin
     }).catch(err => {
-        bot.reply(message, err.message||err)
+        postMessage(textRes.errorMes(err.message||err),message.channel)
     })
 }
+//When logger auth is correct, post this String to api function
 function eventAtt() {
     let attachments = [{
         'fallback' : 'You can not user this feature!',
@@ -117,6 +125,7 @@ function eventAtt() {
     return attachments
 }
 
+//post interface data to slack api
 function postMessage(atts, channel) {
     let bodyPara = {
                 'channel':channel,
@@ -151,26 +160,13 @@ exports.publicPostMsg = function(atts, channel) {
     postMessage(atts,channel)
 }
 
-/*
-{"type":"direct_message","user":"UCSLXUNRG","text":"event ahah","client_msg_id":"db89d447-0aaa-41aa-8d4d-7cea545b24f4","team":"TCSEYGNKW","channel":"DCS415NQH","event_ts":"1539523136.000100","ts":"1539523136.000100","raw_message":{"type":"message","user":"UCSLXUNRG","text":"event ahah","client_msg_id":"db89d447-0aaa-41aa-8d4d-7cea545b24f4","team":"TCSEYGNKW","channel":"DCS415NQH","event_ts":"1539523136.000100","ts":"1539523136.000100"},"_pipeline":{"stage":"receive"},"match":["event"]}
-admincontroller.js:101
-*/
-
-
-exports.setup = function(req, res) {
-    schedule.update()
-    textRes.successRes(res, 'test got it');
-}
-
-
-
-
+//query database to verift user auth
 function verifyAdmin(user_id) {
     return new Promise((resolve, reject) => {
         let results = db.pgQuery('SELECT id FROM admin;')
         results.then(value => {
             if(value.rowCount === 0) {
-                reject('Workspace needs init first! \n `/admin_init`')
+                reject('Workspace needs init first!')
             } else {
                 if(user_id !== value.rows[0]['id']) {
                     reject('Only Admin can use this command!')
@@ -178,11 +174,13 @@ function verifyAdmin(user_id) {
                     resolve('')
                 }
             }
-        }).catch(error => {
-            reject(error.message||err)
+        }).catch(err => {
+            reject(err.message||err)
         })
     })
 }
+
+module.exports = {process_messageText}
 
 
 

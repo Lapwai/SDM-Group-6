@@ -24,6 +24,9 @@ function startBot() {
 
     controller.hears(['event','Event','eventlog','Eventlog'], 
     ['direct_message'], admin.eventlog)
+
+    controller.hears(['view','View'], 
+    ['direct_message'], admin.view)
     
 }
 

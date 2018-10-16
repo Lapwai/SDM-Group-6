@@ -49,7 +49,7 @@ function confAtt() {
     let attachments = [{
         'fallback' : 'You can not user this feature!',
         'mrkdwn_in' : ['pretext','text'],
-        'pretext' : ':mag: *Event log*',
+        'pretext' : ':mag: *Configuration*',
         'text': 'Do you want to setup the configuration of notification?',
         'color' : '#3AA3E3',
         'attachment_type'  : 'default',
@@ -105,6 +105,33 @@ function eventAtt() {
     }]
     return attachments
 }
+
+exports.view = function(bot, message) {
+    let texts = ['view','View']
+    let isView = false
+    texts.forEach(e => {
+        if(e === message.text) { isView = true }
+    });
+    if(isView == false ) { return }
+    verifyAdmin(message.user).then(_ => {
+        postMessage(viewAtt(),message.channel)
+    }).catch(err => {
+        bot.reply(message, err.message||err)
+    })
+}
+function viewAtt() {
+    let attachments = [{
+        'fallback' : 'You can not user this feature!',
+        'mrkdwn_in' : ['pretext','text'],
+        'pretext' : '*View*',
+        'text': 'Please click the link:\nhttps://sdm-g6.herokuapp.com/csv',
+        'color' : 'good',
+        'attachment_type' : 'default',
+        'callback_id': 'view'
+    }]
+    return attachments
+}
+
 
 function postMessage(atts, channel) {
     let bodyPara = {

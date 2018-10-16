@@ -63,7 +63,7 @@ function confAtt() {
     let attachments = [{
         'fallback' : 'You can not user this feature!',
         'mrkdwn_in' : ['pretext','text'],
-        'pretext' : ':mag: *Configuration*',
+        'pretext' : ':mag: *Event log*',
         'text': 'Do you want to setup the configuration of notification?',
         'color' : '#3AA3E3',
         'attachment_type'  : 'default',

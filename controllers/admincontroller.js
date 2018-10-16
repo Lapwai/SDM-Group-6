@@ -41,7 +41,7 @@ exports.configuration = function(bot, message) {
     });
     if(isConf == false ) { return }
     verifyAdmin(message.user).then(_ => {
-        postEphemeral(confAtt(),message.channel, message.user)
+        postMessage(confAtt(),message.channel, message.user,false)
     }).catch(err => {
         bot.reply(message, err.message||err)
     })
@@ -78,7 +78,7 @@ exports.eventlog = function(bot, message) {
     });
     if(isEvent == false ) { return }
     verifyAdmin(message.user).then(_ => {
-        postEphemeral(eventAtt(),message.channel, message.user)
+        postMessage(eventAtt(),message.channel, message.user,false)
     }).catch(err => {
         bot.reply(message, err.message||err)
     })
@@ -107,15 +107,18 @@ function eventAtt() {
     return attachments
 }
 
-function postEphemeral(atts, channel, user) {
+function postMessage(atts, channel, user, ephemeral) {
     let bodyPara = {'scope':'bot',
                 'channel':channel,
                 'user':user,
-                'response_type' : 'in_channel',
                 'text':'',
                 'attachments':atts}
+    let tUrl = 'https://slack.com/api/chat.postMessage'
+    if(ephemeral === true) {
+        tUrl =  'https://slack.com/api/chat.postEphemeral'
+    }
     let options = {
-        url: 'https://slack.com/api/chat.postEphemeral',
+        url: tUrl,
         method:'POST',
         headers: {
             'User-Agent': 'SDM Test',
@@ -132,16 +135,15 @@ function postEphemeral(atts, channel, user) {
             result = body
         }
         if(err || result['error']) {
-            textRes.textRes(res,true,(err || result['error']))
-            reject(err || result['error'])
+            console.log('post error'+(err || result['error']))
         } else {
-            console.log('success')
+            console.log('post success')
         }
     })
 }
 
-exports.publicCostEphemeral = function(atts, channel, user) {
-    postEphemeral(atts,channel,user)
+exports.publicPostMsg = function(atts, channel, user, ephemeral) {
+    postMessage(atts,channel,user,ephemeral)
 }
 
 /*

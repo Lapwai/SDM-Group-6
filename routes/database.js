@@ -98,7 +98,7 @@ function insertEvent(member_id, member_name, theme, date, time) {
         let comment = theme + ';' + date + ';' + time
         let insertSql = 'INSERT INTO feedbacks(member_id, member_name, ts, option, comment) VALUES (\'' + member_id + '\', \'' + member_name + '\', \'now\', \'-1\', \'' + comment + '\');';
         console.log('insert event sql='+insertSql)
-        db.pgQuery(insertSql).then(_ => {
+        pgQuery(insertSql).then(_ => {
             resolve('')
             console.log('insert new survey success!')
         }).catch(err => {

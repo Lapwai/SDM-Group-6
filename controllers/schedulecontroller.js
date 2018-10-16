@@ -32,15 +32,6 @@ function updateSurvey(submission) {
     let timeinterval = submission.timeinterval
     let postpone = submission.postpone
 
-    console.log('updateSurvey 0')
-    console.log(submission)
-    console.log(title)
-    console.log(starttime)
-    console.log(option)
-    console.log(timeinterval)
-    console.log(postpone)
-    console.log('updateSurvey 1')
-
     insertSurvey(title,starttime,option,timeinterval,postpone)
     .then(_ => {
         console.log('insert survey success')
@@ -51,8 +42,8 @@ function updateSurvey(submission) {
 }
 function insertSurvey(title, starttime, option, timeinterval, postpone) {
     return new Promise((resolve, reject) => {
-        let insertSql = 'INSERT INTO survey(title, starttime, option, timeinterval, postpone) VALUES (\'' + title + '\', \'' + starttime + '\', \'' + option + '\', \'' +  + timeinterval + '\', \'' +  + postpone + '\');';
-        console.log('sql='+insertSql)
+        let insertSql = 'INSERT INTO survey(title, starttime, option, timeinterval, postpone) VALUES (\'' + title + '\', \'' + starttime + '\', \'' + option + '\', \'' + timeinterval + '\', \'' + postpone + '\');';
+        console.log('insert survey sql='+insertSql)
         db.pgQuery(insertSql).then(_ => {
             resolve('')
             console.log('insert new survey success!')

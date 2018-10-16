@@ -191,10 +191,14 @@ function eventAtt() {
 function interDialog(payload) {
     if(payload.state === 'conf') {
         shchedule.updateSurvey(payload.submission)
+        admin.publicCostEphemeral(textRes.successMes('Setup configuration success!'),payload.channel.id,payload.user.id)    
     } else if (payload.state === 'event') {
-        
+        db.addEvent(payload)
+        admin.publicCostEphemeral(textRes.successMes('Record event success!'),payload.channel.id,payload.user.id)
     }
 }
+
+
 // {"type":"dialog_submission","token":"NoLDQeFvLs2uJmXkbrc1jlEv","action_ts":"1539539639.051180","team":{"id":"TCSEYGNKW","domain":"sdm-6"},"user":{"id":"UCSLXUNRG","name":"ioswpf"},"channel":{"id":"DCS415NQH","name":"directmessage"},"submission":{"title":"Test title","starttime":"13:00","option":"Very happy; happy; normal; unhappy; hha","timeinterval":"3","postpone":"5"},"callback_id":"conf-dialog","response_url":"https://hooks.slack.com/app/TCSEYGNKW/457285614646/qCeaAQRFq7XK9Nri05A9fMhK","state":"conf"}
 
 

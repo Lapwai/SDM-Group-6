@@ -32,13 +32,6 @@ var adminStr = 'CREATE TABLE IF NOT EXISTS admin ( \
     id                TEXT PRIMARY KEY    NOT NULL\
     ); '
 
-// var roleStr = 'CREATE TABLE IF NOT EXISTS role ( \
-//     id                TEXT PRIMARY KEY    NOT NULL, \
-//     name              TEXT                NOT NULL, \
-//     real_name         TEXT                NOT NULL, \
-//     part              TEXT                NOT NULL \
-//     ); '
-
 var surveyStr = 'CREATE TABLE IF NOT EXISTS survey ( \
     id                SERIAL              PRIMARY KEY, \
     title             TEXT                NOT NULL, \
@@ -54,7 +47,7 @@ var feedbacksStr = 'CREATE TABLE IF NOT EXISTS feedbacks ( \
     member_name       TEXT                NOT NULL, \
     ts                TIMESTAMP           NOT NULL, \
     option            TEXT                NOT NULL, \
-    commentc          TEXT \
+    comment           TEXT \
     ); '   
 
 function addDefault() {
@@ -86,6 +79,34 @@ function checkDefault() {
     })
 }
 
+function addEvent(payload) {
+    let member_id = payload.user.id
+    let member_name = payload.user.name
+    let theme = payload.submission.theme
+    let date = payload.submission.date
+    let time = payload.submission.time
+    insertEvent(member_id,member_name,theme,date,time)
+    .then(_ => {
+        console.log('insert event success')
+    }).catch(err => {
+        console.log('insert event err')
+        console.log(err)
+    }) 
+}
+function insertEvent(member_id, member_name, theme, date, time) {
+    return new Promise((resolve, reject) => {
+        let comment = theme + ';' + date + ';' + time
+        let insertSql = 'INSERT INTO feedbacks(member_id, member_name, ts, option, comment) VALUES (\'' + member_id + '\', \'' + member_name + '\', \'now\', \'-1\', \'' + comment + '\');';
+        console.log('insert event sql='+insertSql)
+        db.pgQuery(insertSql).then(_ => {
+            resolve('')
+            console.log('insert new survey success!')
+        }).catch(err => {
+            reject(err.message || err)
+        })
+    })
+}
+
 async function createTables() { 
     pgQuery(adminStr)
     pgQuery(surveyStr).then(_ => {
@@ -94,5 +115,5 @@ async function createTables() {
     pgQuery(feedbacksStr)
 }
 
-module.exports = {pgQuery, createTables};
+module.exports = {pgQuery, createTables, addEvent};
 

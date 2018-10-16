@@ -7,10 +7,13 @@
 
 <div class="container">
 <h2>Feedbacks</h2>
-
 <ul>
+<li> Member Name - Time - Option - Comment </li>
 <% results.forEach(function(r) { %>
-<li><%= r.member_name %> - <%= r.ts %> - <%= r.option %> - <%= r.comment %></li>
+<li><%= r.member_name %> - <%= r.ts %> - <%= r.option %> - <% if (r.comment) { %>
+    r.comment
+ <% } %></li>
+
 <% }); %>
 
 </ul>

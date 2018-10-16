@@ -123,7 +123,7 @@ function addFeedback(payload) {
 }
 function updateFeedback(member_id, member_name, option, comment) {
     return new Promise((resolve, reject) => {
-        let updateSql = 'UPDATE feedbacks SET member_id=\''+member_id+'\',member_name=\''+member_name+'\',ts =\'now\',option =\''+option+'\',comment=\''+comment+'\',postpone =-1,interval=-1)'
+        let updateSql = 'UPDATE feedbacks SET member_id=\''+member_id+'\',member_name=\''+member_name+'\',ts =\'now\',option =\''+option+'\',comment=\''+comment+'\',postpone =-1,interval=-1;'
         console.log('update feedback sql='+updateSql)
         pgQuery(updateSql).then(_ => {
             resolve('insert new feedback success!')

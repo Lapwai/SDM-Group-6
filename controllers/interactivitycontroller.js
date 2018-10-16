@@ -21,7 +21,6 @@ exports.interactivity = function(req, res) {
 function interButton(payload) {
     let name = payload.actions[0].name
     let value = payload.actions[0].value
-    console.log(payload)
     if(name === 'conf') {
         if(value === 'yes') {
             postDialog(generateOptions(payload.trigger_id,confAtt()))

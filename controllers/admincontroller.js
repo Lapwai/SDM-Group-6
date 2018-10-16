@@ -136,7 +136,7 @@ exports.view = function(bot, message) {
     verifyAdmin(message.user).then(_ => {
         postMessage(viewAtt(),message.channel)
     }).catch(err => {
-        bot.reply(message, err.message||err)
+        postMessage(textRes.errorMes(err.message||err),message.channel)
     })
 }
 //When logger auth is correct, post this String to api function

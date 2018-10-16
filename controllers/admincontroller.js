@@ -31,20 +31,31 @@ exports.init = function(bot, message) {
         postMessage(textRes.errorMes(err.message||err),message.channel)
     });
 }
-
-exports.configuration = function(bot, message) {
+//Process configration command and display a correct page for admin. when the auth is right, show configrationPage, or give a message. 
+exports.open_configurationPage_for_admin= function(bot, message) {
     let texts = ['conf','Conf','configuration','Configuration']
-    let isConf = false
+    isConf = false
+    isConf=process_configuration_messageText(isConf,texts,message)//process admin's command
+    if(isConf == false ) { return } 
+    configuration_verifyAdmin_auth(bot,message)//verify admin auth and post correct page
+    return isConf;
+}
+//process admin's command
+function process_configuration_messageText(isConf,texts,message){
     texts.forEach(e => {
-        if(e === message.text) { isConf = true }
-    });
-    if(isConf == false ) { return }
+        if(e === message.text) { isConf = true }  
+    }); 
+    return isConf;
+}
+//verify admin auth and post correct page
+function configuration_verifyAdmin_auth(bot,message){
     verifyAdmin(message.user).then(_ => {
-        postMessage(confAtt(),message.channel)
+        postMessage(confAtt(),message.channel) //confAtt() is when admin auth is right, post this slack page to admin
     }).catch(err => {
-        bot.reply(message, err.message||err)
+        bot.reply(message, err.message||err)//return err message
     })
 }
+//When admin auth is right, post this slack page to admin
 function confAtt() {
     let attachments = [{
         'fallback' : 'You can not user this feature!',

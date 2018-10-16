@@ -18,16 +18,18 @@
         <th width="30%">Time</th>
         <th width="20%">Selection</th>
         <th width="20%">Comment</th>
-        </tr>
+        
         <% results.forEach(function(r) { %>
+        </tr>
             <td><%= r.name %></td>
             <td><%= r.time %></td>
             <td><%= r.option %></td>
             <td><% if (r.comment) { %>
                 <%= r.comment %>
              <% } %></td>
-        <% }); %>
         </tr>
+        <% }); %>
+       
 </table>
 
 

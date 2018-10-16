@@ -6,43 +6,69 @@ const schedule = require('./schedulecontroller')
 const botkit = require('botkit')
 
 
-
+//init chatbot for one workspace in slack, the one who exec 'init' command will be the administrator
 exports.init = function(bot, message) {
     let isInit = false
-    if('init' === message.text || 'Init' === message.text) { isInit = true }
-    if(isInit == false ) { return }
+    isInit = process_messageText_for_initCommand(isInit,message) //verify the command content (message.text)
+    if(isInit == false ) { return } // if command is incorrect, return directly
+    check_process_initStatus(message) // check init status for current bot
+    
+}
 
-    let results = db.pgQuery('SELECT * FROM admin;')
+// check init status for current bot
+function check_process_initStatus(message){
+    let results = db.pgQuery('SELECT * FROM admin;')//query admin table, check if admin have been assigned.
     results.then(queryValue => {
-        if(queryValue.rowCount == 0) {
-            let id = '\'' + message.user + '\''
-            let insertStr =  'INSERT INTO admin (id) VALUES('+ id + ')'
-            let insert = db.pgQuery(insertStr)
-            insert.then(_ => {
-                let msg = 'Worksapce\'s new app \' *Happiness Level* \' init success!'
-                postMessage(textRes.successMes(msg),message.channel)
-            }).catch(err => {
-                postMessage(textRes.errorMes(err.message||err),message.channel)
-            })
-        } else {
-            postMessage(textRes.errorMes('Workspace already init!'),message.channel)
-        }    
-    }).catch(err => {
+        process_adminQueryResult(queryValue,message)//query Result Process
+    }).catch(err => { //try catch err message 
         postMessage(textRes.errorMes(err.message||err),message.channel)
     });
 }
+//process the result of the admin table query, if admin table no record, means never init, could insert into admin table with current user
+function process_adminQueryResult(queryValue,message){
+    if(queryValue.rowCount == 0) { //if admin is null, this bot have not been inited, need inserted in to admin table
+        let insert=process_insertSql_for_adminTable(message) //process current insert sql for admin table and insert into admin table
+        insert.then(_ => {
+            let msg = process_postMessage_after_insertAdminTable(message) //return post message after init bot with insert current user into admin
+            postMessage(textRes.successMes(msg),message.channel)
+        }).catch(err => {  //try catch err message 
+            postMessage(textRes.errorMes(err.message||err),message.channel)
+        })
+    } else {  //return current bot have been init to user
+        postMessage(textRes.errorMes('Workspace already init!'),message.channel)
+    }    
+}
 
+//process post message after init for current bot
+exports.process_postMessage_after_insertAdminTable = function(){
+    let msg = 'Worksapce\'s new app \' *Happiness Level* \' init success!'
+    return msg
+}
+
+//process current insert sql for admin table and insert into admin table
+ exports.process_insertSql_for_adminTable=function(message){
+    let id = '\'' + message.user + '\''
+    let insertStr =  'INSERT INTO admin (id) VALUES('+ id + ')'
+    let insert = db.pgQuery(insertStr)
+    return insert,insertStr
+}
+
+//process message.text for init commanc, return judgment result with isInin parameter
+ exports.process_messageText_for_initCommand = function(isInit,message){
+    if('init' === message.text || 'Init' === message.text) { isInit = true }
+    return isInit
+}
 //Process configration command and display a correct page for admin. when the auth is right, show configrationPage, or give a message. 
 exports.configuration= function(bot, message) {
     let texts = ['conf','Conf','configuration','Configuration']
     isConf = false
     isConf=process_messageText(isConf,texts,message)//process admin's command
-    if(isConf == false ) { return } 
+    if(isConf == false ) { return }  // if not configration command, return directly.
     configuration_verifyAdmin_auth(message)//verify admin auth and post correct page
 }
 
 //process admin's command
-function process_messageText(isConf,texts,message){
+exports.process_messageText=function(isConf,texts,message){
     texts.forEach(e => {
         if(e === message.text) { isConf = true }  
     }); 

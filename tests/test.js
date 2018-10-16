@@ -51,4 +51,3 @@ describe('#Manager and Researcher list the survey cereated by current people.',f
   });
 
 */
-module.exports = { server_url }

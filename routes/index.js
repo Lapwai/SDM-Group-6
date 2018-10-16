@@ -9,6 +9,20 @@ router.get('/', function(req, res, next) {
 
 router.get('/csv', (req, res) => {
   queryfeedbacks(res)
+<<<<<<< HEAD
+=======
+});
+
+function queryfeedbacks(res) {
+  let selectSql = 'select * from feedbacks where option <> \'-1\';'
+  db.pgQuery(selectSql).then(results => {
+    res.render('feedbacks', {results:results.rows})
+  })
+}
+
+router.post('/para', (req, res) => {
+  res.send(JSON.stringify(req.body))
+>>>>>>> 06ca5cada34c6f86e2659c1a54dd5f4a21deea84
 });
 
 function queryfeedbacks(res) {

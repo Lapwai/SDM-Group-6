@@ -7,6 +7,12 @@ var interactivity_controller = require('../controllers/interactivitycontroller')
 
 
 
+
+
+// confuguration api - set up
+router.post('/setup', admin_controller.setup);
+
+
 // interactivity api - receive button response
 router.post('/interactivity', interactivity_controller.interactivity);
 

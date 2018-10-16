@@ -1,14 +1,14 @@
 
-// var express = require('express'); 
-// var router = express.Router();
+var express = require('express'); 
+var router = express.Router();
 
-// var admin_controller = require('../controllers/admincontroller'); 
+var admin_controller = require('../controllers/admincontroller'); 
 // var survey_controller = require('../controllers/surveycontroller');
 // var my_controller = require('../controllers/mycontroller')
 
-// router.get('/test', (req, res) => {
-//     res.send("slash command get test response!");
-// });
+router.get('/test', (req, res) => {
+    res.send("slash command get test response!");
+});
 
 // Admin slash command
 // router.post('/admin/init', admin_controller.init);
@@ -40,4 +40,4 @@
 // //Personal suervey records
 // router.post('/my/history', my_controller.history);
 
-// module.exports = router;
+module.exports = router;

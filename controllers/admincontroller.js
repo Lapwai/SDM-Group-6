@@ -32,19 +32,33 @@ exports.init = function(bot, message) {
     });
 }
 
-exports.configuration = function(bot, message) {
+//Process configration command and display a correct page for admin. when the auth is right, show configrationPage, or give a message. 
+exports.open_configurationPage_for_admin= function(bot, message) {
     let texts = ['conf','Conf','configuration','Configuration']
-    let isConf = false
+    isConf = false
+    isConf=process_messageText(isConf,texts,message)//process admin's command
+    if(isConf == false ) { return } 
+    configuration_verifyAdmin_auth(message)//verify admin auth and post correct page
+}
+
+//process admin's command
+function process_messageText(isConf,texts,message){
     texts.forEach(e => {
-        if(e === message.text) { isConf = true }
-    });
-    if(isConf == false ) { return }
+        if(e === message.text) { isConf = true }  
+    }); 
+    return isConf;
+}
+
+//verify admin auth and post correct page
+function configuration_verifyAdmin_auth(message){
     verifyAdmin(message.user).then(_ => {
-        postMessage(confAtt(),message.channel)
+        postMessage(confAtt(),message.channel) //confAtt() is when admin auth is right, post this slack page to admin
     }).catch(err => {
         postMessage(textRes.errorMes(err.message||err),message.channel)
     })
 }
+
+//When admin auth is correct, post this string to api function
 function confAtt() {
     let attachments = [{
         'fallback' : 'You can not user this feature!',
@@ -69,19 +83,24 @@ function confAtt() {
     return attachments
 }
 
+//Process logger command and display a correct page for admin. when the auth is right, show event, or give a message. 
 exports.eventlog = function(bot, message) {
     let texts = ['event','Event','eventlog','Eventlog']
     let isEvent = false
-    texts.forEach(e => {
-        if(e === message.text) { isEvent = true }
-    });
+    isEvent=process_messageText(isEvent,texts,message)
     if(isEvent == false ) { return }
+    event_verifyAdmin_auth(message);
+}
+
+//verify logger auth and post correct page
+function event_verifyAdmin_auth(message){
     verifyAdmin(message.user).then(_ => {
-        postMessage(eventAtt(),message.channel)
+        postMessage(eventAtt(),message.channel) //confAtt() is when admin auth is right, post this slack page to admin
     }).catch(err => {
-        bot.reply(message, err.message||err)
+        postMessage(textRes.errorMes(err.message||err),message.channel)
     })
 }
+//When logger auth is correct, post this String to api function
 function eventAtt() {
     let attachments = [{
         'fallback' : 'You can not user this feature!',
@@ -106,6 +125,7 @@ function eventAtt() {
     return attachments
 }
 
+//Process view command and return a web page to admin. when the auth is right, show event, or give a message. 
 exports.view = function(bot, message) {
     let texts = ['view','View']
     let isView = false
@@ -119,6 +139,7 @@ exports.view = function(bot, message) {
         bot.reply(message, err.message||err)
     })
 }
+//When logger auth is correct, post this String to api function
 function viewAtt() {
     let attachments = [{
         'fallback' : 'You can not user this feature!',
@@ -132,7 +153,7 @@ function viewAtt() {
     return attachments
 }
 
-
+//post interface data to slack api
 function postMessage(atts, channel) {
     let bodyPara = {
                 'channel':channel,
@@ -167,6 +188,7 @@ exports.publicPostMsg = function(atts, channel) {
     postMessage(atts,channel)
 }
 
+//query database to verift user auth
 function verifyAdmin(user_id) {
     return new Promise((resolve, reject) => {
         let results = db.pgQuery('SELECT id FROM admin;')
@@ -185,6 +207,8 @@ function verifyAdmin(user_id) {
         })
     })
 }
+
+module.exports = {process_messageText}
 
 
 

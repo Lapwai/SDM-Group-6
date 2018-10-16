@@ -11,6 +11,7 @@ var index = require('./routes/index');
 var externalapi = require('./routes/externalapi');
 var db = require('./routes/database')
 var bot = require('./controllers/happinessbot')
+var schedule = require('./controllers/schedulecontroller')
 
 
 var app = express();

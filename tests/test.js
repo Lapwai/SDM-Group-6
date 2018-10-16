@@ -3,10 +3,9 @@ let expect = require("chai").expect;
 const app = require('../app')
 var http = require('http')
 var request = require('supertest');
-const server_url = 'https://sdm-g6.herokuapp.com/'
 var process_messageText =  require('../controllers/admincontroller').process_messageText;
 
-describe('unit_open_configurationPage_for_admin', function () {
+describe('Unit Test For Admin controller ', function () {
   describe('#process_configuration_messageText()', function () {
       it('should return the result of message', function () {
           var message={"text":"conf"}
@@ -18,15 +17,15 @@ describe('unit_open_configurationPage_for_admin', function () {
       });
   });
   describe('#process_event_messageText()', function () {
-    it('should return the result of event', function () {
-        var message={"text":"event"}
-        var isEvent = false;
-        let texts = ['event','Event','eventlog','Eventlog']
-        isEvent=process_messageText(isEvent,texts,message);
-        console.log(isEvent)
-        expect(isEvent).to.be.ok;
+        it('should return the result of event', function () {
+            var message={"text":"event"}
+            var isEvent = false;
+            let texts = ['event','Event','eventlog','Eventlog']
+            isEvent=process_messageText(isEvent,texts,message);
+            console.log(isEvent)
+            expect(isEvent).to.be.ok;
+        });
     });
-});
 });
 
 

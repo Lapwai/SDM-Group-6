@@ -47,6 +47,8 @@ var feedbacksStr = 'CREATE TABLE IF NOT EXISTS feedbacks ( \
     member_name       TEXT                NOT NULL, \
     ts                TIMESTAMP           NOT NULL, \
     option            TEXT                NOT NULL, \
+    postpone          Int4                NOT NULL, \
+    interval          Int4                NOT NULL, \
     comment           TEXT \
     ); '   
 
@@ -111,7 +113,7 @@ function addFeedback(payload) {
     let member_name = payload.user.name
     let level = payload.submission.level
     let comment = payload.submission.comment
-    insertFeedback(member_id, member_name, level, comment)
+    updateFeedback(member_id, member_name, level, comment)
     .then(value => {
         console.log(value)
     }).catch(err => {
@@ -119,11 +121,11 @@ function addFeedback(payload) {
         console.log(err)
     }) 
 }
-function insertFeedback(member_id, member_name, level, comment) {
+function updateFeedback(member_id, member_name, option, comment) {
     return new Promise((resolve, reject) => {
-        let insertSql = 'INSERT INTO feedbacks(member_id, member_name, ts, option, comment) VALUES (\'' + member_id + '\', \'' + member_name + '\', \'now\', \'' + level + '\', \'' + comment + '\');';
-        console.log('insert feedback sql='+insertSql)
-        pgQuery(insertSql).then(_ => {
+        let updateSql = 'UPDATE feedbacks SET member_id=\''+member_id+'\',member_name=\''+member_name+'\',ts =\'now\',option =\''+option+'\',comment=\''+comment+'\',postpone =-1,interval=-1;'
+        console.log('update feedback sql='+updateSql)
+        pgQuery(updateSql).then(_ => {
             resolve('insert new feedback success!')
         }).catch(err => {
             reject(err.message || err)

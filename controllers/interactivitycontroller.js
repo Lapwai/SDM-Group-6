@@ -32,9 +32,7 @@ function interButton(payload) {
         }
     } else if(name === 'survey') {
         if(value === 'now') {
-            console.log('post survey now')
             querySurveyContent().then(att => {
-                console.log('post survey success')
                 postDialog(generateOptions(payload.trigger_id,att))
             }).catch(err => {
                 console.log('post survey err='+err)
@@ -198,7 +196,7 @@ function querySurveyContent() {
     return new Promise((resolve, reject) => {
         let selectStr = 'SELECT * FROM survey WHERE id=(SELECT Max(id) from survey);'
         db.pgQuery(selectStr).then(value => {
-            let temp = value.rows[0].postpone.option.split(';').map( str => {
+            let temp = value.rows[0].option.split(';').map( str => {
                 return str.trim()
             })
             let options = []

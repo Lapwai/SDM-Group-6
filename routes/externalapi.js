@@ -19,6 +19,7 @@ router.post('/interactivity', interactivity_controller.interactivity);
 // test post notification 
 router.get('/postSurveyNotification', (req, res) => {
     schedule_controller.postSurveyNotification()
+    res.status(200).send('Success');;
 });
 
 

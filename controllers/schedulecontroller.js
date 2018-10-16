@@ -165,7 +165,7 @@ function queryMemberLastFeedback(user) {
 // update or add a new null member's feedback to db
 function updateOrAddMemberFeedback(have,user) {
     return new Promise((resolve, reject) => {
-        let sqlStr = 'INSERT INTO feedbacks(member_id,member_name,ts,option,postpone,interval) VALUES(\'' + user + '\',\' \',\'now\',\' \', -1, 2);';
+        let sqlStr = 'INSERT INTO feedbacks(member_id,member_name,ts,option,comment,postpone,interval) VALUES(\'' + user + '\',\'/\',\'now\',\'/\', \'/\',-1, 2);';
         if(have === true) {
             sqlStr = 'UPDATE feedbacks SET postpone = -1, interval = 2 WHERE id = (select MAX(id) from feedbacks where member_id = \'' + user + '\');'
         }

@@ -2,11 +2,12 @@
 const botkit = require('botkit')
 const admin = require('./admincontroller')
 
+var controller = botkit.slackbot({debug: false})
+let bot = controller.spawn({
+    token: 'xoxb-434508566676-433992928064-cHxo9Ahshc7WvBOQ7m3yn3Fc' // Edit this line!
+})
 function startBot() {
-    var controller = botkit.slackbot({debug: false})
-    controller.spawn({
-           token: 'xoxb-434508566676-433992928064-cHxo9Ahshc7WvBOQ7m3yn3Fc' // Edit this line!
-    }).startRTM(function (err) {
+    bot.startRTM(function (err) {
         if (err) {
             throw new Error(err)
         }
@@ -28,6 +29,14 @@ function startBot() {
     controller.hears(['view','View'], 
     ['direct_message'], admin.view)
     
+
+    setTimeout(() => {
+        endBot()
+    }, 1000 * 10);
+}
+
+function endBot() {
+    bot.closeRTM()
 }
 
 

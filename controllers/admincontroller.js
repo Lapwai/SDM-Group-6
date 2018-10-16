@@ -33,7 +33,7 @@ exports.init = function(bot, message) {
 }
 
 //Process configration command and display a correct page for admin. when the auth is right, show configrationPage, or give a message. 
-exports.open_configurationPage_for_admin= function(bot, message) {
+exports.configuration= function(bot, message) {
     let texts = ['conf','Conf','configuration','Configuration']
     isConf = false
     isConf=process_messageText(isConf,texts,message)//process admin's command
@@ -208,7 +208,7 @@ function verifyAdmin(user_id) {
     })
 }
 
-module.exports = {process_messageText}
+// module.exports = {process_messageText}
 
 
 

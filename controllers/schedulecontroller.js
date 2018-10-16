@@ -138,7 +138,6 @@ function querySurveyContent(users) {
             let id = value.rows[0].id
             let title = value.rows[0].title
             let minutes = value.rows[0].postpone.minutes
-            console.log(value.rows[0])
             let att = gengerateAttachment(id,title,minutes)
             resolve(att)
         }).catch(err => {

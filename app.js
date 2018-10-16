@@ -41,8 +41,6 @@ db.createTables();
 app.use('/', index);
 app.use('/api', externalapi)
 bot.startBot()
-schedule.postSurveyNotification()
-
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -21,7 +21,7 @@ exports.interactivity = function(req, res) {
 function interButton(payload) {
     let name = payload.actions[0].name
     let value = payload.actions[0].value
-    
+    console.log(payload)
     if(name === 'conf') {
         if(value === 'yes') {
             postDialog(generateOptions(payload.trigger_id,confAtt()))
@@ -30,16 +30,20 @@ function interButton(payload) {
         if(value === 'yes') {
             postDialog(generateOptions(payload.trigger_id,eventAtt()))
         }
-    } else if (name === 'survey') {
+    } else if(name === 'survey') {
         if(value === 'now') {
+            console.log('post survey now')
             querySurveyContent().then(att => {
+                console.log('post survey success')
                 postDialog(generateOptions(payload.trigger_id,att))
             }).catch(err => {
-                console.log()
+                console.log('post survey err='+err)
             })
         } else {
-            // postpone
+            console.log('post survey postpone')
         }
+    } else {
+        console.log('interactivity button ' + name )
     }
 }
 
@@ -202,6 +206,7 @@ function querySurveyContent() {
                 options.push({'label':e, 'value':''+i})           
             })
             let att = surveyAtt(options)
+            console.log(att)
             resolve(att)
         }).catch(err => {
             reject(err.message||err)

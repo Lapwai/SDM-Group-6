@@ -1,22 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <style>
+    table{ background-color:#aaa; line-height:25px;}
+    th{ background-color:#fff;}
+    td{ background-color:#fff; text-align:center}
+    </style>
 </head>
 
 <body>
 
 <div class="container">
-<h2>Feedbacks</h2>
-<ul>
-<li> Member Name - Time - Option - Comment </li>
-<% results.forEach(function(r) { %>
-<li><%= r.member_name %> - <%= r.ts %> - <%= r.option %> - <% if (r.comment) { %>
-    r.comment
- <% } %></li>
+<h2 align="center">Feedbacks</h2>
+<table cellpadding="0" cellspacing="1" align="center">
+        <tr>
+        <th width="30%">Member name</th>
+        <th width="30%">Time</th>
+        <th width="20%">Selection</th>
+        <th width="20%">Comment</th>
+        </tr>
+        <% results.forEach(function(r) { %>
+            <td><%= r.name %></td>
+            <td><%= r.time %></td>
+            <td><%= r.option %></td>
+            <td><% if (r.comment) { %>
+                <%= r.comment %>
+             <% } %></td>
+        <% }); %>
+        </tr>
+</table>
 
-<% }); %>
-
-</ul>
 
 </div>
 

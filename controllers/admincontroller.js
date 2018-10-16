@@ -16,20 +16,19 @@ exports.init = function(bot, message) {
     results.then(queryValue => {
         if(queryValue.rowCount == 0) {
             let id = '\'' + message.user + '\''
-
             let insertStr =  'INSERT INTO admin (id) VALUES('+ id + ')'
             let insert = db.pgQuery(insertStr)
             insert.then(_ => {
                 let msg = 'Worksapce\'s new app \' *Happiness Level* \' init success!'
-                postMessage(textRes.successMes(msg),message.channel, message.user,false)
+                postMessage(textRes.successMes(msg),message.channel)
             }).catch(err => {
-                postMessage(textRes.errorMes(err.message||err),message.channel, message.user,false)
+                postMessage(textRes.errorMes(err.message||err),message.channel)
             })
         } else {
-            postMessage(textRes.errorMes('Workspace already init!'),message.channel, message.user,false)
+            postMessage(textRes.errorMes('Workspace already init!'),message.channel)
         }    
     }).catch(err => {
-        postMessage(textRes.errorMes(err.message||err),message.channel, message.user,false)
+        postMessage(textRes.errorMes(err.message||err),message.channel)
     });
 }
 
@@ -41,7 +40,7 @@ exports.configuration = function(bot, message) {
     });
     if(isConf == false ) { return }
     verifyAdmin(message.user).then(_ => {
-        postMessage(confAtt(),message.channel, message.user,false)
+        postMessage(confAtt(),message.channel)
     }).catch(err => {
         bot.reply(message, err.message||err)
     })
@@ -78,7 +77,7 @@ exports.eventlog = function(bot, message) {
     });
     if(isEvent == false ) { return }
     verifyAdmin(message.user).then(_ => {
-        postMessage(eventAtt(),message.channel, message.user,false)
+        postMessage(eventAtt(),message.channel)
     }).catch(err => {
         bot.reply(message, err.message||err)
     })
@@ -107,20 +106,16 @@ function eventAtt() {
     return attachments
 }
 
-function postMessage(atts, channel, user, ephemeral) {
-    let bodyPara = {'scope':'bot',
+function postMessage(atts, channel) {
+    let bodyPara = {
                 'channel':channel,
-                'user':user,
-                'text':'',
                 'attachments':atts}
-    let tUrl = 'https://slack.com/api/chat.postMessage'
-    if(ephemeral === true) {
-        tUrl =  'https://slack.com/api/chat.postEphemeral'
-    }
+    console.log(JSON.stringify(bodyPara))
     let options = {
-        url: tUrl,
+        url: 'https://slack.com/api/chat.postMessage',
         method:'POST',
         headers: {
+            'scope':'bot',
             'User-Agent': 'SDM Test',
             'content-type': 'application/json; charset=utf-8',
             'Authorization' : 'Bearer xoxb-434508566676-433992928064-cHxo9Ahshc7WvBOQ7m3yn3Fc'
@@ -142,8 +137,8 @@ function postMessage(atts, channel, user, ephemeral) {
     })
 }
 
-exports.publicPostMsg = function(atts, channel, user, ephemeral) {
-    postMessage(atts,channel,user,ephemeral)
+exports.publicPostMsg = function(atts, channel) {
+    postMessage(atts,channel)
 }
 
 /*

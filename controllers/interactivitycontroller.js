@@ -191,10 +191,10 @@ function eventAtt() {
 function interDialog(payload) {
     if(payload.state === 'conf') {
         shchedule.updateSurvey(payload.submission)
-        admin.publicPostMsg(textRes.successMes('Setup configuration success!'),payload.channel.id,payload.user.id,true)    
+        admin.publicPostMsg(textRes.successMes('Setup configuration success!'),payload.channel.id)    
     } else if (payload.state === 'event') {
         db.addEvent(payload)
-        admin.publicPostMsg(textRes.successMes('Record event success!'),payload.channel.id,payload.user.id,true)
+        admin.publicPostMsg(textRes.successMes('Record event success!'),payload.channel.id)
     }
 }
 

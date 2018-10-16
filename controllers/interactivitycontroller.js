@@ -21,7 +21,6 @@ exports.interactivity = function(req, res) {
 function interButton(payload) {
     let name = payload.actions[0].name
     let value = payload.actions[0].value
-    console.log(payload)
     if(name === 'conf') {
         if(value === 'yes') {
             postDialog(generateOptions(payload.trigger_id,confAtt()))
@@ -200,8 +199,8 @@ function querySurveyContent() {
                 return str.trim()
             })
             let options = []
-            temp.forEach(function(e,i) {
-                options.push({'label':e, 'value':''+i})           
+            temp.forEach(e => {
+                options.push({'label':e, 'value':e})           
             })
             let att = surveyAtt(options)
             resolve(att)
@@ -243,7 +242,7 @@ function interDialog(payload) {
         admin.publicPostMsg(textRes.successMes('Record event success!'),payload.channel.id)
     } else if (payload.state === 'survey') {
         db.addFeedback(payload)
-        admin.publicPostMsg(textRes.successMes('Your feedback Submit success!'),payload.channel.id)
+        admin.publicPostMsg(textRes.successMes('Thanks for your assistance, your submission has saved.'),payload.channel.id)
     }
 }
 

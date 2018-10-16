@@ -20,7 +20,9 @@ function checkSurvey() {
 }
 
 function addTodaySurvey(value) {
-    console.log('today survey')
+    let job = nodeSchedule.scheduleJob('* * 0 * * 1-5', function() {
+        
+    });
 }
 
 // when admin submit new configuration will invoke this method
@@ -66,6 +68,7 @@ function postSurveyNotification() {
         console.log('post survey notification error =' + err)
     })
 }
+// query all member id from genernal channel
 function queryGeneralMembers() {
     return new Promise((resolve, reject) => {
         let options = {
@@ -87,6 +90,7 @@ function queryGeneralMembers() {
         })
     })
 }
+// query admin id from db
 function queryAdminID() {
     return new Promise((resolve, reject) => {
         let sqlStr = 'select * from admin;'
@@ -97,38 +101,97 @@ function queryAdminID() {
         })
     })
 }
+// ********** open a channel to send notification to user **********
 function openChannelWithUser(user) {
-    let bodyPara = {'users':user}
-    let options = {
-        url: '	https://slack.com/api/conversations.open',
-        method:'POST',
-        headers: {
-            'scope':'bot',
-            'User-Agent': 'SDM Test',
-            'content-type': 'application/json; charset=utf-8',
-            'Authorization' : 'Bearer xoxb-434508566676-433992928064-cHxo9Ahshc7WvBOQ7m3yn3Fc'
-        },
-        body: JSON.stringify(bodyPara)
-    };
-    request(options, (err, _, body) => {
-        let result = {}
-        if((typeof body) === 'string') {
-            result = JSON.parse(body)
-        } else {
-            result = body
-        }
-        if(err || result['error']) {
-            console.log('open channel with user err='+(err || result['error']))
-        } else {
-            let channel = result.channel.id
-            querySurveyContent().then(att => {
-                postNotificationToUser(att, channel)
-            }).catch(err => {
-
+    queryMemberLastFeedback(user).then(have => {
+        updateOrAddMemberFeedback(have,user).then(value => {
+            // ignore action
+            setTimeout(function() {
+                checkMemberLastFeedbackInterval(user)
+            }, 1000 * 30);
+            
+            let bodyPara = {'users':user}
+            let options = {
+                url: '	https://slack.com/api/conversations.open',
+                method:'POST',
+                headers: {
+                    'scope':'bot',
+                    'User-Agent': 'SDM Test',
+                    'content-type': 'application/json; charset=utf-8',
+                    'Authorization' : 'Bearer xoxb-434508566676-433992928064-cHxo9Ahshc7WvBOQ7m3yn3Fc'
+                },
+                body: JSON.stringify(bodyPara)
+            };
+            request(options, (err, _, body) => {
+                let result = {}
+                if((typeof body) === 'string') {
+                    result = JSON.parse(body)
+                } else {
+                    result = body
+                }
+                if(err || result['error']) {
+                    console.log('open channel with user err='+(err || result['error']))
+                } else {
+                    let channel = result.channel.id
+                    querySurveyContent().then(att => {
+                        postNotificationToUser(att, channel)
+                    }).catch(err => {
+        
+                    })
+                }
             })
-        }
+        }).catch(err => {
+            console.log("updateOrAddMemberFeedback error = " + err)
+        })
+    }).catch(err => {
+        console.log("queryMemberLastFeedback error = " + err)
     })
 }
+// query member's last feedback from db
+function queryMemberLastFeedback(user) {
+    return new Promise((resolve, reject) => {
+        let sqlStr = 'select * from feedbacks where id = (select MAX(id) from feedbacks where member_id = \'' + user + '\') and member_id = \'' + user + '\' and ts > now() - interval \'23 hours\';'
+        db.pgQuery(sqlStr).then(value => {
+            if(value.rows.length > 0) {
+                resolve(true)
+            } else {
+                resolve(false)
+            }
+        }).catch(err => {
+            reject(err.message||err)
+        })
+    })
+}
+// update or add a new null member's feedback to db
+function updateOrAddMemberFeedback(have,user) {
+    return new Promise((resolve, reject) => {
+        let sqlStr = 'INSERT INTO feedbacks(member_id,member_name,ts,option,postpone,interval) VALUES(\'' + user + '\',\' \',\'now\',\' \', -1, 2);';
+        if(have === true) {
+            sqlStr = 'UPDATE feedbacks SET postpone = -1, interval = 2 WHERE id = (select MAX(id) from feedbacks where member_id = \'' + user + '\');'
+        }
+        db.pgQuery(sqlStr).then(value => {
+            resolve('')
+        }).catch(err => {
+            reject(err.members)
+        })
+    })
+}
+// check whether the lastest feedbacks inteval == 2 
+function checkMemberLastFeedbackInterval(user){
+    let sqlStr = 'SELECT interval FROM feedbacks WHERE id = (select MAX(id) from feedbacks where member_id = \'' + user + '\');'
+    db.pgQuery(sqlStr).then(value => {
+        if(value.rows.length > 0) {
+            if(value.rows[0].interval > 0) {
+                openChannelWithUser(user)
+            }
+        } else {
+            console.log('checkMemberLastFeedbackInterval err = rows.length=0')
+        }
+    }).catch(err => {
+        console.log('checkMemberLastFeedbackInterval err = ' + err)
+    })
+} 
+// query the lastest survey content
 function querySurveyContent() {
     return new Promise((resolve, reject) => {
         let selectStr = 'SELECT * FROM survey WHERE id=(SELECT Max(id) from survey);'
@@ -199,12 +262,21 @@ function postNotificationToUser(atts, channel) {
 }
 
 
+// postpone - send survey again 
 function postponeSurvey(payload) {
-    console.log("postpone=" + JSON.stringify(payload))
-    var second = 1000 * parseInt(payload.actions[0].value)
+    var second = 1000 * parseInt(payload.actions[0].value)*20
     setTimeout(function() {
         openChannelWithUser(payload.user.id)
     }, second);
+    postponeUpdateFeedback(payload.actions[0].value,payload.user.id)
+}
+function postponeUpdateFeedback(minutes, user) {
+    let sqlStr = 'UPDATE feedbacks SET postpone = ' + minutes + ', interval = -1 WHERE id = (select MAX(id) from feedbacks where member_id = \'' + user + '\');'
+    db.pgQuery(sqlStr).then(value => {
+        console.log('postponeUpdateFeedback success')
+    }).catch(err => {
+        console.log('postponeUpdateFeedback err = ' + err)
+    })
 }
 
 /*

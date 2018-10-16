@@ -43,10 +43,12 @@ var surveyStr = 'CREATE TABLE IF NOT EXISTS survey ( \
 
 var feedbacksStr = 'CREATE TABLE IF NOT EXISTS feedbacks ( \
     id                SERIAL              PRIMARY KEY, \
-    member_id         TEXT                NOT NULL, \
+    member_id         mTEXT                NOT NULL, \
     member_name       TEXT                NOT NULL, \
     ts                TIMESTAMP           NOT NULL, \
     option            TEXT                NOT NULL, \
+    postpone          Int4                NOT NULL, \
+    interval          Int4                NOT NULL, \
     comment           TEXT \
     ); '   
 
@@ -121,7 +123,7 @@ function addFeedback(payload) {
 }
 function insertFeedback(member_id, member_name, level, comment) {
     return new Promise((resolve, reject) => {
-        let insertSql = 'INSERT INTO feedbacks(member_id, member_name, ts, option, comment) VALUES (\'' + member_id + '\', \'' + member_name + '\', \'now\', \'' + level + '\', \'' + comment + '\');';
+        let insertSql = 'INSERT INTO feedbacks(member_id, member_name, ts, option, comment, postpone, interval) VALUES (\'' + member_id + '\', \'' + member_name + '\', \'now\', \'' + level + '\', \'' + comment + '\', -1, -1);';
         console.log('insert feedback sql='+insertSql)
         pgQuery(insertSql).then(_ => {
             resolve('insert new feedback success!')

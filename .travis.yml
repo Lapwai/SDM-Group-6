@@ -1,12 +1,10 @@
 language: node_js
 node_js:
  - '8.11.3'
- services:
+services:
   - postgresql
 before_script:
   - psql -c 'create database travis_ci_test;' -U postgres
-addons:
-  postgresql: "10"
 scripts": 
  - "npm start"
  - "npm test"

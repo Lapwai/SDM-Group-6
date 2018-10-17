@@ -50,9 +50,9 @@ function updateSurvey(submission) {
     let postpone = submission.postpone
     insertSurvey(title,starttime,option,timeinterval,postpone)
     .then(value => {
-        console.log(value)
+        return ''
     }).catch(err => {
-        console.log('insert survey err=' + err)
+        return err
     }) 
 }
 /**
@@ -69,7 +69,7 @@ function insertSurvey(title, starttime, option, timeinterval, postpone) {
         db.pgQuery(insertSql).then(_ => {
             resolve('insert new survey success!')
         }).catch(err => {
-            reject(err.message || err)
+            reject('insert survey err='+(err.message || err))
         })
     })
 }

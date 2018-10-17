@@ -50,6 +50,7 @@ function successRes(res,text) {
             'mrkdwn_in': ['text','pretext']
         }]
     }
+    res.status(200)
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(responseObject));
 }
@@ -77,6 +78,7 @@ function errorRes(req,res,text) {
             'mrkdwn_in': ['text','pretext']
         }]
     }
+    res.status(500)
     res.setHeader('content-type', 'application/json');
     res.send(JSON.stringify(responseObject));
 }

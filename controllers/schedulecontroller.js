@@ -52,7 +52,7 @@ function updateSurvey(submission) {
     .then(value => {
         console.log(value)
     }).catch(err => {
-        console.log('insert survey err='=err)
+        console.log('insert survey err=' + err)
     }) 
 }
 /**

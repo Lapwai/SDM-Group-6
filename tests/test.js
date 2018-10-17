@@ -53,7 +53,12 @@ describe('Unit Test For Admin controller ', function () {
             expect(msg).to.include(expect_msg);
         });
     });
-    happinessbot.endBot()
+    console.log('test end log 0')
+    setTimeout(() => {
+        console.log('test bot end 0')
+        happinessbot.endBot()
+    }, 1000 * 5);
+    console.log('test end log 1')
 });
 
 

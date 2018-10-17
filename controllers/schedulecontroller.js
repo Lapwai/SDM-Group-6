@@ -6,7 +6,7 @@ const nodeSchedule = require('node-schedule')
 
 // default schedule -  eveyday 0am the system will check the lastest survey confuguration
 function defaultSchedule() {
-    let job = nodeSchedule.scheduleJob('* * * * 1-5', function() {
+    let job = nodeSchedule.scheduleJob('* 0 0 * * 1-5', function() {
         checkSurvey()
     });
 }
@@ -21,8 +21,10 @@ function checkSurvey() {
 
 function addTodaySurvey(value) {
     queryLastSurveySetting().then(value => {
-        console.log(value.getHours())
-        let job = nodeSchedule.scheduleJob('* * '+ value.getHours() +' * * *', function() {
+        var date = Date.now();
+        date.setHours(value.getHours())
+        console.log('today date=' + date)
+        var j = schedule.scheduleJob(date, function(){
             postSurveyNotification()
         });
     }).catch(err => {

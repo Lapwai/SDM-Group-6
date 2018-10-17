@@ -134,7 +134,11 @@ function updateFeedback(member_id, member_name, option, comment) {
 }
 
 async function createTables() { 
-    pgQuery(adminStr)
+    pgQuery(adminStr).then(_ => {
+        console.log('admin create success')
+    }).catch(err => {
+        console.log('admin create err=' + err)
+    })
     pgQuery(surveyStr).then(_ => {
         addDefault()
     })

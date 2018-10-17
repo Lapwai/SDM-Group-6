@@ -52,9 +52,12 @@ function process_insertSql_for_adminTable(message){
     return new Promise((resolve, reject) => {
         let id = '\'' + message.user + '\''
         let insertStr = 'INSERT INTO admin (id) VALUES('+ id + ')'
+        console.log(insertStr)
         db.pgQuery(insertStr).then(value => {
+            console.log('insert admin success')
             resolve('')
         }).catch(err => {
+            console.log('insert admin err='+err)
             reject(err.message || err)
         })
     })

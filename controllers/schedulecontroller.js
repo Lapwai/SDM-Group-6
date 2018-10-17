@@ -6,7 +6,7 @@ const nodeSchedule = require('node-schedule')
 
 // default schedule -  eveyday 0am the system will check the lastest survey confuguration
 function defaultSchedule() {
-    let job = nodeSchedule.scheduleJob('* * 0 * * 1-5', function() {
+    let job = nodeSchedule.scheduleJob('* * * * 1-5', function() {
         checkSurvey()
     });
 }
@@ -20,11 +20,26 @@ function checkSurvey() {
 }
 
 function addTodaySurvey(value) {
-    let job = nodeSchedule.scheduleJob('* * 0 * * 1-5', function() {
-        
-    });
+    queryLastSurveySetting().then(value => {
+        console.log(value.getHours())
+        let job = nodeSchedule.scheduleJob('* * '+ value.getHours() +' * * *', function() {
+            postSurveyNotification()
+        });
+    }).catch(err => {
+        console.log('today survey notification error')
+    })
 }
-
+// query the lastest survey content
+function queryLastSurveySetting() {
+    return new Promise((resolve, reject) => {
+        let selectStr = 'SELECT * FROM survey WHERE id=(SELECT Max(id) from survey);'
+        db.pgQuery(selectStr).then(value => {
+            resolve(value.rows[0].starttime)
+        }).catch(err => {
+            reject(err.message||err)
+        })
+    })   
+}
 // when admin submit new configuration will invoke this method
 function updateSurvey(submission) {
     let title = submission.title
@@ -162,6 +177,7 @@ function queryMemberLastFeedback(user) {
         })
     })
 }
+
 // update or add a new null member's feedback to db
 function updateOrAddMemberFeedback(have,user) {
     return new Promise((resolve, reject) => {
@@ -283,13 +299,6 @@ function postponeUpdateFeedback(minutes, user) {
 {"actions":[{"name":"recommend","value":"recommend","type":"button"}],"callback_id":"comic_1234_xyz","channel":{"id":"C065W1189","name":"forgotten-works"},"message_ts":"1458170866.000004","response_url":"https://hooks.slack.com/actions/T47563693/6204672533/x7ZLaiVMoECAW50Gw1ZYAXEM","type":"interactive_message","team":{"id":"T47563693","domain":"watermelonsugar"},"action_ts":"1458170917.164398","token":"xAB3yVzGS4BQ3O9FACTa8Ho4","trigger_id":"13345224609.738474920.8088930838d88f008e0","user":{"id":"U045VRZFT","name":"brautigan"},"attachment_id":"1"}
 */
 
-// run 
-function runloop() {
-
-}
 
 
-
-
-
-module.exports = {updateSurvey,postSurveyNotification,postponeSurvey}
+module.exports = {defaultSchedule,updateSurvey,postSurveyNotification,postponeSurvey}

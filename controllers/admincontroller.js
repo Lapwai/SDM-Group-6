@@ -6,38 +6,66 @@ const schedule = require('./schedulecontroller')
 const botkit = require('botkit')
 
 
-
-exports.init = function(bot, message) {
+//init chatbot for one workspace in slack, the one who exec 'init' command will be the administrator
+function init(bot, message) {
     let isInit = false
-    if('init' === message.text || 'Init' === message.text) { isInit = true }
-    if(isInit == false ) { return }
+    isInit = process_messageText_for_initCommand(isInit,message) //verify the command content (message.text)
+    if(isInit == false ) { return } // if command is incorrect, return directly
+    check_process_initStatus(message) // check init status for current bot
+    
+}
 
-    let results = db.pgQuery('SELECT * FROM admin;')
+// check init status for current bot
+function check_process_initStatus(message){
+    let results = db.pgQuery('SELECT * FROM admin;')//query admin table, check if admin have been assigned.
     results.then(queryValue => {
-        if(queryValue.rowCount == 0) {
-            let id = '\'' + message.user + '\''
-            let insertStr =  'INSERT INTO admin (id) VALUES('+ id + ')'
-            let insert = db.pgQuery(insertStr)
-            insert.then(_ => {
-                let msg = 'Worksapce\'s new app \' *Happiness Level* \' init success!'
-                postMessage(textRes.successMes(msg),message.channel)
-            }).catch(err => {
-                postMessage(textRes.errorMes(err.message||err),message.channel)
-            })
-        } else {
-            postMessage(textRes.errorMes('Workspace already init!'),message.channel)
-        }    
-    }).catch(err => {
+        process_adminQueryResult(queryValue,message)//query Result Process
+    }).catch(err => { //try catch err message 
         postMessage(textRes.errorMes(err.message||err),message.channel)
     });
 }
+//process the result of the admin table query, if admin table no record, means never init, could insert into admin table with current user
+function process_adminQueryResult(queryValue,message){
+    if(queryValue.rowCount == 0) { //if admin is null, this bot have not been inited, need inserted in to admin table
+        // when init the workspace, system should add a default schedule to check notification setting of notification everyday
+        schedule.defaultSchedule()
+        let insert=process_insertSql_for_adminTable(message) //process current insert sql for admin table and insert into admin table
+        insert.then(_ => {
+            let msg = process_postMessage_after_insertAdminTable(message) //return post message after init bot with insert current user into admin
+            postMessage(textRes.successMes(msg),message.channel)
+        }).catch(err => {  //try catch err message 
+            postMessage(textRes.errorMes(err.message||err),message.channel)
+        })
+    } else {  //return current bot have been init to user
+        postMessage(textRes.errorMes('Workspace already init!'),message.channel)
+    }    
+}
 
+//process post message after init for current bot
+function process_postMessage_after_insertAdminTable(){
+    let msg = 'Worksapce\'s new app \' *Happiness Level* \' init success!'
+    return msg
+}
+
+//process current insert sql for admin table and insert into admin table
+function process_insertSql_for_adminTable(message){
+    let id = '\'' + message.user + '\''
+    let insertStr =  'INSERT INTO admin (id) VALUES('+ id + ')'
+    let insert = db.pgQuery(insertStr)
+    return insert,insertStr
+}
+
+//process message.text for init commanc, return judgment result with isInin parameter
+function process_messageText_for_initCommand(isInit,message){
+    if('init' === message.text || 'Init' === message.text) { isInit = true }
+    return isInit
+}
 //Process configration command and display a correct page for admin. when the auth is right, show configrationPage, or give a message. 
-exports.configuration= function(bot, message) {
+function configuration(bot, message) {
     let texts = ['conf','Conf','configuration','Configuration']
     isConf = false
     isConf=process_messageText(isConf,texts,message)//process admin's command
-    if(isConf == false ) { return } 
+    if(isConf == false ) { return }  // if not configration command, return directly.
     configuration_verifyAdmin_auth(message)//verify admin auth and post correct page
 }
 
@@ -84,7 +112,7 @@ function confAtt() {
 }
 
 //Process logger command and display a correct page for admin. when the auth is right, show event, or give a message. 
-exports.eventlog = function(bot, message) {
+function eventlog(bot, message) {
     let texts = ['event','Event','eventlog','Eventlog']
     let isEvent = false
     isEvent=process_messageText(isEvent,texts,message)
@@ -126,7 +154,7 @@ function eventAtt() {
 }
 
 //Process view command and return a web page to admin. when the auth is right, show event, or give a message. 
-exports.view = function(bot, message) {
+function view(bot, message) {
     let texts = ['view','View']
     let isView = false
     texts.forEach(e => {
@@ -184,7 +212,7 @@ function postMessage(atts, channel) {
     })
 }
 
-exports.publicPostMsg = function(atts, channel) {
+function publicPostMsg(atts, channel) {
     postMessage(atts,channel)
 }
 
@@ -208,171 +236,9 @@ function verifyAdmin(user_id) {
     })
 }
 
-// module.exports = {process_messageText}
 
 
-
-{
-// exports.add = function(req, res) {
-//     let isAdmin = verifyAdmin(req.body.user_id);
-//     isAdmin.then(_ => {
-//         let users = req.body.text.split(' ').map( str => {
-//             return str.trim()
-//         })
-//         let part = users[0]
-//         let verify = addVerifyParams(users)
-//         if(verify[0] == false) {
-//             textRes.errorRes(req,res,verify[1])
-//             return
-//         }
-//         users.splice(0,1)
-
-//         addRequestMembers().then(members => {
-//             let insertStr = addGenerateSql(part, users, members)
-//             if(insertStr[0] === false) {
-//                 textRes.errorRes(req,res,insertStr[1])
-//                 return
-//             }
-//             let insert = db.pgQuery(insertStr[1])
-//             insert.then(_ => {
-//                 textRes.successRes(res,'Add success!')
-//             }).catch(err => {
-//                 textRes.errorRes(req,res,err.message||err)
-//             })
-//         }).catch(err => {
-//             textRes.errorRes(req,res,err.message||err)
-//         })
-//     }).catch(err => {
-//         textRes.errorRes(req,res,err.message||err)
-//     })
-// }
-// function addVerifyParams(users) {
-//     if(users.length < 2 || (users[0] !== 'researcher' && users[0] !== 'manager')) {
-//         return [false, 'Please input correct command! \n `/admin_add researcher/manager @user1 @user2 ...` ']
-//     } else {
-//         return [true,'']
-//     }
-// }
-
-// function addRequestMembers() {
-//     return new Promise((resolve, reject) => {
-//         let options = {
-//             url: 'https://slack.com/api/users.list?scope=users:read',
-//             headers: {
-//                 'User-Agent': 'SDM Test',
-//                 'Authorization' : 'Bearer xoxa-2-434508566676-445609127334-444065434292-a41d63c89c65b7a2a9bacc9bfe61faa4'
-//             }
-//         };
-//         request(options, (err, _, body) => {
-//             let result = {}
-//             if((typeof body) === 'string') {
-//                 result = JSON.parse(body)
-//             } else {
-//                 result = body
-//             }
-//             if(err || result['error']) {
-//                 textRes.textRes(res,true,(err || result['error']))
-//                 reject(err || result['error'])
-//             }
-//             let dict = []
-//             let members = result['members']
-//             resolve(members)
-//         })
-//     })
-// }
-
-// function addGenerateSql(role, users, members) {
-//     var dict = []
-//     for(let i = 0; i<members.length; i++) {
-//         for(let j = 0; j<users.length; j++) {
-//             if(users[j].substring(1) == members[i]['name']) {
-//                 let temp = [members[i]['id'],members[i]['name']]
-//                 let display_name = members[i]['profile']['display_name']
-//                 if(display_name.length == 0) {
-//                     temp.push(members[i]['profile']['real_name'])
-//                 } else {
-//                     temp.push(display_name)
-//                 }
-//                 dict.push(temp)
-//                 break;
-//             }
-//         }
-//     }
-//     if(dict.length === 0) {
-//         return [false, 'Did not find the member!']
-//     }
-//     let insertStr = 'INSERT INTO role VALUES '
-//     dict.forEach( (e) => {
-//         insertStr = insertStr + '(\'' + e[0] + '\',\'' + e[1] + '\',\'' + e[2] + '\',\'' + role + '\'),'
-//     })
-//     insertStr = insertStr.substring(0, insertStr.length-1) + ';'
-//     return [true,insertStr]
-// }
-
-// exports.delete = function(req, res) {
-//     let isAdmin = verifyAdmin(req.body.user_id);
-//     isAdmin.then(_ => {
-//         let users = req.body.text.split(' ')
-//         let selectStr = deleteQueryRealname(users)
-//         db.pgQuery(selectStr).then(value => {
-//             if(value.rowCount === 0) {
-//                 textRes.errorRes(req,res,'Did not find the member!')
-//                 return
-//             }
-//             let deleteStr = deleteGenerateSql(users)
-//             db.pgQuery(deleteStr).then(_ => {
-//                 let names = ''
-//                 value.rows.forEach(e => {
-//                     names = names.concat(e['real_name'] + ', ')
-//                 });
-//                 textRes.successRes(res,'Delete success! \n~'+ names.substring(0,names.length-2) +'~')
-//             }).catch(err => {
-//                 textRes.errorRes(req,res,err.message||err)
-//             })
-//         }).catch(err => {
-//             textRes.errorRes(req,res,err.message||err)
-//         })
-//     }).catch(err => {
-//         textRes.errorRes(req,res,err.message||err)
-//     })
-// }
-// function deleteQueryRealname(users) {
-//     return 'SELECT real_name FROM role WHERE name IN ' + deleteNames(users)
-// }
-// function deleteGenerateSql(users) {
-//     return 'DELETE FROM role WHERE name IN ' + deleteNames(users)
-// }
-// function deleteNames(users) {
-//     let names = '('
-//     users.forEach(e => {
-//         names = names.concat('\'', e.substring(1), '\'', ',')
-//     });
-//     return  names.substring(0, names.length-1).concat(')')
-// }
-
-// exports.list = function(req, res) {
-//     let isAdmin = verifyAdmin(req.body.user_id);
-//     isAdmin.then(_ => {
-//         let text = req.body.text.trim()
-//         if(text !== 'researcher' && text !== 'manager') {
-//             textRes.errorRes(req,res,'Please input correct command! \n `/admin_list researcher/manager`')
-//             return
-//         }
-//         let selectStr = 'SELECT * FROM role WHERE part=\''+ text +'\';';
-//         db.pgQuery(selectStr).then(selectValue => {
-//             let names = ''
-//             selectValue.rows.forEach((e) => {
-//                 names = names + e['real_name'] + '\n'
-//             })
-//             textRes.successRes(res,'*'+ text.substring(0,1).toUpperCase()+text.substring(1) + ': *\n' + names)
-//         }).catch(err => {
-//             textRes.errorRes(req,res,err.message||err)
-//         })
-//     }).catch(err => {
-//         textRes.errorRes(req,res,err.message||err)
-//     })
-// }
-}
+module.exports = {init, process_postMessage_after_insertAdminTable, process_insertSql_for_adminTable, process_messageText_for_initCommand, configuration, process_messageText, eventlog, view, publicPostMsg}
 
 
 // {'token':'NoLDQeFvLs2uJmXkbrc1jlEv','team_id':'TCSEYGNKW','team_domain':'sdm-6','channel_id':'GCTJDNRA5','channel_name':'privategroup','user_id':'UCSLXUNRG','user_name':'ioswpf','command':'/init','text':'','response_url':'https://hooks.slack.com/commands/TCSEYGNKW/441441585712/ks8147qG9BaAcmdCI0qaNNbJ','trigger_id':'441581991553.434508566676.747ed520202d5c75a011b6205132d274'}

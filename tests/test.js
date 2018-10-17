@@ -8,17 +8,26 @@ var process_messageText =  require('../controllers/admincontroller').process_mes
 var process_messageText_for_initCommand = require('../controllers/admincontroller').process_messageText_for_initCommand;
 var process_insertSql_for_adminTable = require('../controllers/admincontroller').process_insertSql_for_adminTable;
 var process_postMessage_after_insertAdminTable = require('../controllers/admincontroller').process_postMessage_after_insertAdminTable;
+var verifyAdmin = require('../controllers/admincontroller').verifyAdmin;
 
 
 describe('Unit Test For Admin controller ', function () {
   describe('#process_configuration_messageText()', function () {
-      it('should return the result of message', function () {
+      it('should return the result of process_messageText', function () {
           var message={"text":"conf"}
           var isConf = false;
           let texts = ['conf','Conf','configuration','Configuration'];
           isConf=process_messageText(isConf,texts,message);
           console.log(isConf)
           expect(isConf).to.be.ok;
+      });
+      it('should return the result of verifyAdmin auth', (done) => {
+        var user_id='UCSLXUNRG'
+        console.log(user_id)
+        verifyAdmin(user_id).then( (result) => {
+          expect(result).to.equal('');
+          expect(result).to.include(user_id)
+        }).finally(done);
       });
   });
   describe('#process_event_messageText()', function () {
@@ -39,13 +48,16 @@ describe('Unit Test For Admin controller ', function () {
             console.log(isInit)
             expect(isInit).to.be.ok;
         });
-        it('should return the result of insert admin table sql correctly', function () {
+        it('should return the result of insert admin table sql correctly', (done) => {
             var message={"user":"User1"}
             var expect_insertStr =  'INSERT INTO admin (id) VALUES(\'User1\')'
-            var insertStr = process_insertSql_for_adminTable(message);
-            console.log(insertStr)
-            expect(insertStr).to.include(expect_insertStr);
-        });
+            console.log(expect_insertStr)
+            process_insertSql_for_adminTable(message).then( (result) => {
+              expect(result).to.equal('');
+              expect(result).to.include(expect_insertStr)
+            }).finally(done);
+          });
+
         it('should return a correct message for init command', function () {
             var expect_msg = 'Worksapce\'s new app \' *Happiness Level* \' init success!'
             var msg= process_postMessage_after_insertAdminTable();

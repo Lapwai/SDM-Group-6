@@ -243,7 +243,7 @@ function verifyAdmin(user_id) {
 
 
 
-module.exports = {init, process_postMessage_after_insertAdminTable, process_insertSql_for_adminTable, process_messageText_for_initCommand, configuration, process_messageText, eventlog, view, publicPostMsg}
+module.exports = {init, process_postMessage_after_insertAdminTable, process_insertSql_for_adminTable, process_messageText_for_initCommand, configuration, process_messageText, eventlog, view, publicPostMsg, verifyAdmin}
 
 
 // {'token':'NoLDQeFvLs2uJmXkbrc1jlEv','team_id':'TCSEYGNKW','team_domain':'sdm-6','channel_id':'GCTJDNRA5','channel_name':'privategroup','user_id':'UCSLXUNRG','user_name':'ioswpf','command':'/init','text':'','response_url':'https://hooks.slack.com/commands/TCSEYGNKW/441441585712/ks8147qG9BaAcmdCI0qaNNbJ','trigger_id':'441581991553.434508566676.747ed520202d5c75a011b6205132d274'}

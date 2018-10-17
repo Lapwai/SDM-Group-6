@@ -226,7 +226,7 @@ function querySurveyContent() {
 }
 function gengerateAttachment(id,title,minutes) {
     let attachments = [{
-        "fallback" : "You can not user this feature!",
+        "fallback" : "Just remind it is your time to submit your happiness information.",
         "mrkdwn_in" : ["pretext","text"],
         "pretext" : ":mag: *Survey*",
         'text': title + '\nDo you want to do it now?',

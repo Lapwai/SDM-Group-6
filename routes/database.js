@@ -117,13 +117,13 @@ function addFeedback(payload) {
     .then(value => {
         console.log(value)
     }).catch(err => {
-        console.log('insert event err')
+        console.log('insert feedback err')
         console.log(err)
     }) 
 }
 function updateFeedback(member_id, member_name, option, comment) {
     return new Promise((resolve, reject) => {
-        let updateSql = 'UPDATE feedbacks SET ts =\'now\',option =\''+option+'\',comment=\''+comment+'\',postpone =-1,interval=-1 where id = SELECT Max(id) from feedbacks where member_id = \''+member_id+'\';'
+        let updateSql = 'UPDATE feedbacks SET member_name =\''+member_name+'\',ts =\'now\',option =\''+option+'\',comment=\''+comment+'\',postpone =-1,interval=-1 where id = (SELECT Max(id) from feedbacks where member_id = \''+member_id+'\');'
         console.log('update feedback sql='+updateSql)
         pgQuery(updateSql).then(_ => {
             resolve('insert new feedback success!')

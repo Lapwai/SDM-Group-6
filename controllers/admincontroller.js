@@ -94,7 +94,7 @@ function configuration_verifyAdmin_auth(message){
 //When admin auth is correct, post this string to api function
 function confAtt() {
     let attachments = [{
-        'fallback' : 'You can not user this feature!',
+        'fallback' : 'This is Happiness Level.',
         'mrkdwn_in' : ['pretext','text'],
         'pretext' : ':mag: *Configuration*',
         'text': 'Do you want to setup the configuration of notification?',
@@ -136,7 +136,7 @@ function event_verifyAdmin_auth(message){
 //When logger auth is correct, post this String to api function
 function eventAtt() {
     let attachments = [{
-        'fallback' : 'You can not user this feature!',
+        'fallback' : 'This is Happiness Level.',
         'mrkdwn_in' : ['pretext','text'],
         'pretext' : ':mag: *Event log*',
         'text': 'Do you want to record an event?',
@@ -175,7 +175,7 @@ function view(bot, message) {
 //When logger auth is correct, post this String to api function
 function viewAtt() {
     let attachments = [{
-        'fallback' : 'You can not user this feature!',
+        'fallback' : 'This is Happiness Level.',
         'mrkdwn_in' : ['pretext','text'],
         'pretext' : '*View*',
         'text': 'Please click the link:\nhttps://sdm-g6.herokuapp.com/csv',

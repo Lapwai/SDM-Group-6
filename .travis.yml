@@ -18,6 +18,3 @@ deploy:
   on:
     repo: Lapwai/SDM-Group-6
   skip_cleanup: true
-
-  
-

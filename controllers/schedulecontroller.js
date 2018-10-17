@@ -180,7 +180,7 @@ function queryMemberLastFeedback(user) {
  */
 function updateOrAddMemberFeedback(have,user) {
     return new Promise((resolve, reject) => {
-        let sqlStr = 'INSERT INTO feedbacks(member_id,member_name,ts,option,comment,postpone,interval) VALUES(\'' + user + '\',\'/\',\'now\',\'/\', \'/\',-1, 2);';
+        let sqlStr = 'INSERT INTO feedbacks(member_id,member_name,ts,option,postpone,interval) VALUES(\'' + user + '\',\'/\',\'now\',\'/\',-1, 2);';
         if(have === true) {
             sqlStr = 'UPDATE feedbacks SET postpone = -1, interval = 2 WHERE id = (select MAX(id) from feedbacks where member_id = \'' + user + '\');'
         }
@@ -366,6 +366,7 @@ function postponeUpdateTeamMemberStatus(minutes, user) {
     })
 }
 
+<<<<<<< HEAD
 module.exports = {systemAddDefaultSchedule,updateSurvey,postSurveyNotification,postponeTeamMemberNotification,insertSurvey}
 
 
@@ -373,3 +374,6 @@ module.exports = {systemAddDefaultSchedule,updateSurvey,postSurveyNotification,p
 /*
 {"actions":[{"name":"recommend","value":"recommend","type":"button"}],"callback_id":"comic_1234_xyz","channel":{"id":"C065W1189","name":"forgotten-works"},"message_ts":"1458170866.000004","response_url":"https://hooks.slack.com/actions/T47563693/6204672533/x7ZLaiVMoECAW50Gw1ZYAXEM","type":"interactive_message","team":{"id":"T47563693","domain":"watermelonsugar"},"action_ts":"1458170917.164398","token":"xAB3yVzGS4BQ3O9FACTa8Ho4","trigger_id":"13345224609.738474920.8088930838d88f008e0","user":{"id":"U045VRZFT","name":"brautigan"},"attachment_id":"1"}
 */
+=======
+module.exports = {systemAddDefaultSchedule,updateSurvey,postSurveyNotification,postponeTeamMemberNotification}
+>>>>>>> e8f69905d4a9c6ec19002dc5d3c8ac4d06d5b9aa

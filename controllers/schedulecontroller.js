@@ -366,14 +366,5 @@ function postponeUpdateTeamMemberStatus(minutes, user) {
     })
 }
 
-<<<<<<< HEAD
 module.exports = {systemAddDefaultSchedule,updateSurvey,postSurveyNotification,postponeTeamMemberNotification,insertSurvey}
 
-
-
-/*
-{"actions":[{"name":"recommend","value":"recommend","type":"button"}],"callback_id":"comic_1234_xyz","channel":{"id":"C065W1189","name":"forgotten-works"},"message_ts":"1458170866.000004","response_url":"https://hooks.slack.com/actions/T47563693/6204672533/x7ZLaiVMoECAW50Gw1ZYAXEM","type":"interactive_message","team":{"id":"T47563693","domain":"watermelonsugar"},"action_ts":"1458170917.164398","token":"xAB3yVzGS4BQ3O9FACTa8Ho4","trigger_id":"13345224609.738474920.8088930838d88f008e0","user":{"id":"U045VRZFT","name":"brautigan"},"attachment_id":"1"}
-*/
-=======
-module.exports = {systemAddDefaultSchedule,updateSurvey,postSurveyNotification,postponeTeamMemberNotification}
->>>>>>> e8f69905d4a9c6ec19002dc5d3c8ac4d06d5b9aa

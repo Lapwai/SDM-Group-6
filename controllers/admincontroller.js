@@ -28,7 +28,7 @@ function check_process_initStatus(message){
 function process_adminQueryResult(queryValue,message){
     if(queryValue.rowCount == 0) { //if admin is null, this bot have not been inited, need inserted in to admin table
         // when init the workspace, system should add a default schedule to check notification setting of notification everyday
-        schedule.defaultSchedule()
+        schedule.systemAddDefaultSchedule()
         let insert=process_insertSql_for_adminTable(message) //process current insert sql for admin table and insert into admin table
         insert.then(_ => {
             let msg = process_postMessage_after_insertAdminTable(message) //return post message after init bot with insert current user into admin

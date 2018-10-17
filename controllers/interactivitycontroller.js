@@ -4,46 +4,60 @@ const textRes = require('./textresponse')
 const shchedule = require('./schedulecontroller')
 const admin = require('./admincontroller')
 
+/**
+ * Receive request from slack actions such as buttons and dialogs.
+ * interactive_message means button,
+ * dialog_submission means dialog.
+ */
 exports.interactivity = function(req, res) {
     let payload = JSON.parse(req.body.payload)
     if(payload.type === 'interactive_message') {
-        interButton(payload)
+        interactivityReceivedButtonReq(payload)
         textRes.successRes(res, 'Got it!')
     } else if(payload.type === 'dialog_submission') {
-        interDialog(payload)
+        interactivityReceivedDialogReq(payload)
         res.status(200)
         res.send();
     } else {
         textRes.errorRes(req,res, req.body.payload)
     }
 }
-function interButton(payload) {
+
+/**
+ * Receive request from slack buttons submission.
+ * @param {object} payload three different type of slack buttion submit(configuration, eventlog from  admin and survey from team member).
+ */
+function interactivityReceivedButtonReq(payload) {
     let name = payload.actions[0].name
     let value = payload.actions[0].value
     if(name === 'conf') {
         if(value === 'yes') {
-            postDialog(generateOptions(payload.trigger_id,confAtt()))
+            postDialogToSlack(generateRequestOptions(payload.trigger_id,configurationResponseAttachments()))
         }
     } else if(name === 'event') {
         if(value === 'yes') {
-            postDialog(generateOptions(payload.trigger_id,eventAtt()))
+            postDialogToSlack(generateRequestOptions(payload.trigger_id,eventlogResponseAttachments()))
         }
     } else if(name === 'survey') {
         if(value === 'now') {
-            querySurveyContent().then(att => {
-                postDialog(generateOptions(payload.trigger_id,att))
+            surveyResponseAttachments().then(att => {
+                postDialogToSlack(generateRequestOptions(payload.trigger_id,att))
             }).catch(err => {
                 console.log('post survey err='+err)
             })
         } else {
-            shchedule.postponeSurvey(payload)
+            shchedule.postponeTeamMemberNotification(payload)
         }
     } else {
         console.log('interactivity button ' + name )
     }
 }
 
-function postDialog(options) {
+/**
+ * When system receive a button submission from slack, system will post back a dialog immediately.
+ * @param {object} options request option includes request basic data such as url, body, method, heraders.
+ */
+function postDialogToSlack(options) {
     request(options, (err, _, body) => {
         let result = {}
         if((typeof body) === 'string') {
@@ -59,7 +73,12 @@ function postDialog(options) {
     })
 }
 
-function generateOptions(trigger_id,att) {
+/**
+ * When bot system receive a button submission from slack, system will post back a dialog immediately
+ * @param {string} trigger_id buttion submission trigger id,
+ * @param {object} att slack message attachments.
+ */
+function generateRequestOptions(trigger_id,att) {
     let bodyPara = {'trigger_id':trigger_id,
                 'dialog':att}
     let options = {
@@ -75,7 +94,10 @@ function generateOptions(trigger_id,att) {
     return options
 }
 
-function confAtt() {
+/**
+ * Static attachments about configuration dialog UI which shows admin setup configuration
+ */
+function configurationResponseAttachments() {
     let attachments ={
         'callback_id': 'conf',
         'title': 'Configuration',
@@ -162,7 +184,10 @@ function confAtt() {
     }
     return attachments
 }
-function eventAtt() {
+/**
+ * Static attachments about eventlog dialog UI which shows admin record an event
+ */
+function eventlogResponseAttachments() {
     let attachments ={
         'callback_id': 'event',
         'title': 'Event log',
@@ -190,7 +215,10 @@ function eventAtt() {
     }
     return attachments
 }
-function querySurveyContent() {
+/**
+ * Static attachments about dialog UI which shows team member can submit a survey  
+ */
+function surveyResponseAttachments() {
     return new Promise((resolve, reject) => {
         let selectStr = 'SELECT * FROM survey WHERE id=(SELECT Max(id) from survey);'
         db.pgQuery(selectStr).then(value => {
@@ -201,14 +229,19 @@ function querySurveyContent() {
             temp.forEach(e => {
                 options.push({'label':e, 'value':e})           
             })
-            let att = surveyAtt(options)
+            let att = generateSurveyResAtt(options)
             resolve(att)
         }).catch(err => {
             reject(err.message||err)
         })
     })
 }
-function surveyAtt(options) {
+
+/**
+ * Retrun a full attachment about survey response
+ * @param {object} options survey options in dialog
+ */
+function generateSurveyResAtt(options) {
     let attachments ={
         'callback_id': 'survey',
         'title': 'Survey',
@@ -232,7 +265,12 @@ function surveyAtt(options) {
     return attachments
 }
 
-function interDialog(payload) {
+
+/**
+ * Receive request from slack buttons submission.
+ * @param {object} payload three different type of slack dialog submit(configuration, eventlog from  admin and survey from team member).
+ */
+function interactivityReceivedDialogReq(payload) {
     if(payload.state === 'conf') {
         shchedule.updateSurvey(payload.submission)
         admin.publicPostMsg(textRes.successMes('Setup configuration success!'),payload.channel.id)    
@@ -244,6 +282,9 @@ function interDialog(payload) {
         admin.publicPostMsg(textRes.successMes('Thanks for your assistance, your submission has saved.'),payload.channel.id)
     }
 }
+
+
+
 
 
 // {"type":"dialog_submission","token":"NoLDQeFvLs2uJmXkbrc1jlEv","action_ts":"1539539639.051180","team":{"id":"TCSEYGNKW","domain":"sdm-6"},"user":{"id":"UCSLXUNRG","name":"ioswpf"},"channel":{"id":"DCS415NQH","name":"directmessage"},"submission":{"title":"Test title","starttime":"13:00","option":"Very happy; happy; normal; unhappy; hha","timeinterval":"3","postpone":"5"},"callback_id":"conf-dialog","response_url":"https://hooks.slack.com/app/TCSEYGNKW/457285614646/qCeaAQRFq7XK9Nri05A9fMhK","state":"conf"}

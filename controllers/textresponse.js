@@ -1,5 +1,9 @@
 var app = require('../app')
 
+/**
+ * Generate success attachment message with text
+ * @param {string} text text.
+ */ 
 function successMes(text) {
     var responseObject = [{
         'fallback': 'Required plain-text summary of the attachment.',
@@ -12,6 +16,11 @@ function successMes(text) {
     }]
     return responseObject
 }
+
+/**
+ * Generate error attachment message with text
+ * @param {string} text text.
+ */ 
 function errorMes(text) {
     var responseObject = [{
         'fallback': 'Required plain-text summary of the attachment.',
@@ -25,6 +34,11 @@ function errorMes(text) {
     return responseObject
 }
 
+/**
+ * Response success message with attachment
+ * @param {object} res response.
+ * @param {string} text text.
+ */ 
 function successRes(res,text) {
     var responseObject = {
         'attachments': [{
@@ -40,6 +54,12 @@ function successRes(res,text) {
     res.send(JSON.stringify(responseObject));
 }
 
+/**
+ * Response error message with attachment
+ * @param {object} req original request.
+ * @param {object} res response.
+ * @param {string} text text.
+ */
 function errorRes(req,res,text) {
     let command = '\n\nYour previous command: \n_'
     if(req.body.command){

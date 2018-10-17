@@ -32,6 +32,7 @@ function startBot() {
 
 function endBot() {
     bot.closeRTM()
+    bot.destroy()
 }
 
 

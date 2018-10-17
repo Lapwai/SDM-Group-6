@@ -57,7 +57,7 @@ describe('Unit Test For Admin controller ', function () {
     setTimeout(() => {
         console.log('test bot end 0')
         happinessbot.endBot()
-    }, 1000 * 5);
+    }, 1000 * 10);
     console.log('test end log 1')
 });
 

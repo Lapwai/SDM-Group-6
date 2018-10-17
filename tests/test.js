@@ -10,6 +10,11 @@ var process_postMessage_after_insertAdminTable = require('../controllers/adminco
 var process_insertSql_for_adminTable = require('../controllers/admincontroller').process_insertSql_for_adminTable
 var insertSurvey = require('../controllers/schedulecontroller').insertSurvey
 const server_url = 'https://sdm-g6.herokuapp.com/'
+var db=require('../routes/database')
+db.createTables();
+
+
+
 describe('Unit Test', function () {
   describe('#adminController_process_configuration_messageText()', function () {
       it('should return the result of process_messageText', function () {

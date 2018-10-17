@@ -49,10 +49,15 @@ function process_postMessage_after_insertAdminTable(){
 
 //process current insert sql for admin table and insert into admin table
 function process_insertSql_for_adminTable(message){
-    let id = '\'' + message.user + '\''
-    let insertStr =  'INSERT INTO admin (id) VALUES('+ id + ')'
-    let insert = db.pgQuery(insertStr)
-    return insert,insertStr
+    return new Promise((resolve, reject) => {
+        let id = '\'' + message.user + '\''
+        let insertStr =  'INSERT INTO admin (id) VALUES('+ id + ')'
+        db.pgQuery(insertStr).then(value => {
+            resolve('')
+        }).catch(err => {
+            reject(err.message || err)
+        })
+    })
 }
 
 //process message.text for init commanc, return judgment result with isInin parameter

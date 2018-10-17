@@ -53,11 +53,10 @@ describe('Unit Test For Admin controller ', function () {
             expect(msg).to.include(expect_msg);
         });
     });
-    
+    happinessbot.endBot()
 });
 
 
-happinessbot.endBot()
 
 
 // "test": "./node_modules/mocha/bin/mocha ./tests/test.js"

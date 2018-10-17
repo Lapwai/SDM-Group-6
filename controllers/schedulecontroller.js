@@ -20,27 +20,13 @@ function checkSurvey() {
 }
 
 function addTodaySurvey(value) {
-    queryLastSurveySetting().then(value => {
-        var date = Date.now();
-        date.setHours(value.getHours())
-        console.log('today date=' + date)
-        var j = schedule.scheduleJob(date, function(){
-            postSurveyNotification()
-        });
-    }).catch(err => {
-        console.log('today survey notification error')
-    })
-}
-// query the lastest survey content
-function queryLastSurveySetting() {
-    return new Promise((resolve, reject) => {
-        let selectStr = 'SELECT * FROM survey WHERE id=(SELECT Max(id) from survey);'
-        db.pgQuery(selectStr).then(value => {
-            resolve(value.rows[0].starttime)
-        }).catch(err => {
-            reject(err.message||err)
-        })
-    })   
+    var date = Date.now();
+    date.setHours(value.starttime.getHours())
+    console.log('today date=' + date)
+    var j = schedule.scheduleJob(date, function(){
+        postSurveyNotification()
+    });    
+    
 }
 // when admin submit new configuration will invoke this method
 function updateSurvey(submission) {
@@ -122,11 +108,7 @@ function queryAdminID() {
 function openChannelWithUser(user) {
     queryMemberLastFeedback(user).then(have => {
         updateOrAddMemberFeedback(have,user).then(value => {
-            // ignore action
-            setTimeout(function() {
-                checkMemberLastFeedbackInterval(user)
-            }, 1000 * 30);
-            
+            defaultTimeIntervalSendSurvey(user)
             let bodyPara = {'users':user}
             let options = {
                 url: '	https://slack.com/api/conversations.open',
@@ -164,6 +146,19 @@ function openChannelWithUser(user) {
         console.log("queryMemberLastFeedback error = " + err)
     })
 }
+// if a team member ignore the notification 
+function defaultTimeIntervalSendSurvey(user) {
+    let selectStr = 'SELECT * FROM survey WHERE id=(SELECT Max(id) from survey);'
+    db.pgQuery(selectStr).then(value => {
+        // ignore action
+        setTimeout(function() {
+            checkMemberLastFeedbackInterval(user)
+        }, 1000 * value.rows[0].timeinterval.minutes * 60);
+    }).catch(err => {
+        console.log(err)
+    })
+}
+
 // query member's last feedback from db
 function queryMemberLastFeedback(user) {
     return new Promise((resolve, reject) => {
@@ -282,7 +277,7 @@ function postNotificationToUser(atts, channel) {
 
 // postpone - send survey again 
 function postponeSurvey(payload) {
-    var second = 1000 * parseInt(payload.actions[0].value)*20
+    var second = 1000 * parseInt(payload.actions[0].value)*60
     setTimeout(function() {
         openChannelWithUser(payload.user.id)
     }, second);

@@ -67,7 +67,8 @@ function insertSurvey(title, starttime, option, timeinterval, postpone) {
     return new Promise((resolve, reject) => {
         let insertSql = 'INSERT INTO survey(title, starttime, option, timeinterval, postpone) VALUES (\'' + title + '\', \'' + starttime + '\', \'' + option + '\', \'' + timeinterval + '\', \'' + postpone + '\');';
         db.pgQuery(insertSql).then(_ => {
-            resolve('insert new survey success!')
+            console.log(1)
+            resolve('')
         }).catch(err => {
             reject('insert survey err='+(err.message || err))
         })
@@ -365,7 +366,7 @@ function postponeUpdateTeamMemberStatus(minutes, user) {
     })
 }
 
-module.exports = {systemAddDefaultSchedule,updateSurvey,postSurveyNotification,postponeTeamMemberNotification}
+module.exports = {systemAddDefaultSchedule,updateSurvey,postSurveyNotification,postponeTeamMemberNotification,insertSurvey}
 
 
 

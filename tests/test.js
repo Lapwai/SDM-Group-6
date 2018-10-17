@@ -8,6 +8,8 @@ var process_messageText =  require('../controllers/admincontroller').process_mes
 var process_messageText_for_initCommand = require('../controllers/admincontroller').process_messageText_for_initCommand;
 var process_postMessage_after_insertAdminTable = require('../controllers/admincontroller').process_postMessage_after_insertAdminTable;
 
+var process_insertSql_for_adminTable = require('../controllers/admincontroller').process_insertSql_for_adminTable
+
 
 describe('Unit Test For Admin controller ', function () {
   describe('#process_configuration_messageText()', function () {
@@ -44,13 +46,17 @@ describe('Unit Test For Admin controller ', function () {
             console.log(expect_msg)
             expect(msg).to.include(expect_msg);
         });
+        it('should return a sql str', function(done) {
+            var sqlPromise = process_insertSql_for_adminTable({'user':'user'})
+            sqlPromise.then(value => {
+                expect(value).to.be.equal('')
+                done()
+            })
+        })
     });
-    console.log('test end log 0')
     setTimeout(() => {
-        console.log('test bot end 0')
         happinessbot.endBot()
     }, 1000 * 10);
-    console.log('test end log 1')
 });
 
 

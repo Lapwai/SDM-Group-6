@@ -84,3 +84,7 @@ function errorRes(req,res,text) {
 }
 
 module.exports = {successMes, errorMes, successRes, errorRes};
+
+
+
+

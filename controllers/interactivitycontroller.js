@@ -58,6 +58,8 @@ function interactivityReceivedButtonReq(payload) {
  * @param {object} options request option includes request basic data such as url, body, method, heraders.
  */
 function postDialogToSlack(options) {
+    console.log('success 2')
+
     request(options, (err, _, body) => {
         let result = {}
         if((typeof body) === 'string') {
@@ -66,7 +68,8 @@ function postDialogToSlack(options) {
             result = body
         }
         if(err || result['error']) {
-            console.log( err || result['error'])
+            console.log('error 1' + err || result['error'])
+            console.log(JSON.stringify(result['response_metadata']))
         } else {
             console.log('success')
         }
@@ -91,6 +94,7 @@ function generateRequestOptions(trigger_id,att) {
         },
         body: JSON.stringify(bodyPara)
     };
+    console.log('success 1')
     return options
 }
 
@@ -229,6 +233,7 @@ function surveyResponseAttachments() {
             temp.forEach(e => {
                 options.push({'label':e, 'value':e})           
             })
+            console.log('success 0')
             let att = generateSurveyResAtt(options)
             resolve(att)
         }).catch(err => {
